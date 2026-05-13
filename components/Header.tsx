@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react"
 import { AnimatePresence, motion } from "framer-motion"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
+import { useTheme } from "@/components/ThemeProvider"
 
 const products = [
   { label: "Uploading", title: "Name me your plants, I will know how to take care of it" },
@@ -13,6 +14,28 @@ const products = [
   { label: "Weather", title: "Updated on the weather needs for your plants" },
   { label: "Application", title: "All of this in our website, or in our application" },
 ]
+
+function ExternalNavItem({
+  href,
+  children,
+}: {
+  href: string
+  children: React.ReactNode
+}) {
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="px-3 py-1.5 rounded-md text-sm transition-colors"
+      style={{ color: "var(--muted)" }}
+      onMouseEnter={(e) => (e.currentTarget.style.color = "var(--text)")}
+      onMouseLeave={(e) => (e.currentTarget.style.color = "var(--muted)")}
+    >
+      {children}
+    </a>
+  )
+}
 
 
 const panelVariants = {
@@ -75,13 +98,10 @@ function SunIcon() {
 export default function HeaderDropdown() {
   const router = useRouter()
   const [open, setOpen] = useState(false)
-  const [dark, setDark] = useState(false)
+  const { dark, toggle } = useTheme()
   const ref = useRef<HTMLDivElement>(null)
 
   // apply theme to <html>
-  useEffect(() => {
-    document.documentElement.classList.toggle("dark", dark)
-  }, [dark])
 
   // close on outside click
   useEffect(() => {
@@ -94,8 +114,11 @@ export default function HeaderDropdown() {
 
   return (
     <header
-      className="relative flex  items-center justify-between pl-16 pr-24 h-16"
-      style={{ borderBottom: "1px solid var(--border)", background: "var(--bg)" }}
+      className="fixed top-0 left-0 w-full z-50 flex items-center justify-between pl-88 pr-88 h-16"
+      style={{
+        borderBottom: "1px solid var(--border)",
+        background: "var(--bg)",
+      }}
     >
       <div className="flex items-center font-semibold text-sm cursor-pointer" onClick={() => router.push("/")} style={{ color: "var(--text)" }}>
         Candy Blossom
@@ -103,17 +126,28 @@ export default function HeaderDropdown() {
 
       <nav className="flex items-center gap-6">
         <div className="flex items-center gap-4">
-          {["Source", "Docs", "Pricing", "Contact"].map((item) => (
-            <a
-              key={item}
-              href="#"
-              className="px-3 py-1.5 rounded-md text-sm transition-colors"
-              style={{ color: "var(--muted)" }}
-              onMouseEnter={e => (e.currentTarget.style.color = "var(--text)")}
-              onMouseLeave={e => (e.currentTarget.style.color = "var(--muted)")}
-            >
-              {item}
-            </a>
+          {[
+            { label: "Source", href: "/source", external: false },
+            { label: "Docs", href: "/docs", external: false },
+            { label: "Pricing", href: "/pricing", external: false }, // internal optional
+            { label: "Contact", href: "/contact", external: false },
+          ].map((item) => (
+            item.external ? (
+              <ExternalNavItem key={item.label} href={item.href}>
+                {item.label}
+              </ExternalNavItem>
+            ) : (
+              <Link
+                key={item.label}
+                href={item.href}
+                className="px-3 py-1.5 rounded-md text-sm transition-colors"
+                style={{ color: "var(--muted)" }}
+                onMouseEnter={(e) => (e.currentTarget.style.color = "var(--text)")}
+                onMouseLeave={(e) => (e.currentTarget.style.color = "var(--muted)")}
+              >
+                {item.label}
+              </Link>
+            )
           ))}
           <div className="relative" ref={ref}>
             <button
@@ -128,7 +162,7 @@ export default function HeaderDropdown() {
               <motion.svg
                 animate={{ rotate: open ? 180 : 0 }}
                 transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-                className="w-3.5 h-3.5 opacity-60"
+                className="w-3.5 h-3.5 opacity-60 cursor-pointer"
                 fill="none" viewBox="0 0 24 24" stroke="currentColor"
               >
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -148,7 +182,7 @@ export default function HeaderDropdown() {
                     border: "1px solid var(--border)",
                     color: "var(--text)",
                   }}
-                  className="absolute left-1/2 -translate-x-1/2 top-full mt-2 w-[680px] rounded-2xl shadow-2xl z-50 overflow-hidden"
+                  className="absolute left-1/2 -translate-x-1/2 top-full mt-2 w-[680px] rounded-2xl shadow-2xl z-50 overflow-hidden cursor-pointer"
                 >
 
                   <div className="grid grid-cols-3">
@@ -180,7 +214,7 @@ export default function HeaderDropdown() {
                     style={{ borderTop: "1px solid var(--border)" }}
                   >
                     <a href="#" className="text-sm font-medium text-blue-400 hover:text-blue-300 transition-colors">
-                      Changelogs →
+                      Changelogs
                     </a>
                   </motion.div>
                 </motion.div>
@@ -192,18 +226,19 @@ export default function HeaderDropdown() {
         <div className="flex items-center gap-3">
           {/* Moon / Sun toggle */}
           <motion.button
-            onClick={() => setDark(!dark)}
+            onClick={toggle}
             whileTap={{ scale: 0.9 }}
-            className="flex items-center justify-center w-8 h-8 rounded-full bg-transparent transition-colors"
+            className="flex items-center justify-center w-8 h-8 rounded-full bg-transparent transition-colors cursor-pointer relative"
             style={{ color: "var(--muted)" }}
           >
-            <AnimatePresence mode="wait">
+            <AnimatePresence>
               <motion.span
                 key={dark ? "moon" : "sun"}
                 initial={{ opacity: 0, rotate: -30, scale: 0.7 }}
                 animate={{ opacity: 1, rotate: 0, scale: 1 }}
                 exit={{ opacity: 0, rotate: 30, scale: 0.7 }}
                 transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
+                className="absolute inset-0 flex items-center justify-center"
               >
                 {dark ? <MoonIcon /> : <SunIcon />}
               </motion.span>
@@ -222,15 +257,17 @@ export default function HeaderDropdown() {
 
           <a
             href="#"
-            className="text-sm font-medium px-[12px] py-1.5 rounded-full border transition-colors"
-            style={{ color: "var(--text)", borderColor: "var(--border)" }}
-            onMouseEnter={e => {
-              (e.currentTarget as HTMLElement).style.background = "var(--text)"
-                ; (e.currentTarget as HTMLElement).style.color = "var(--bg)"
+            className="text-sm font-medium px-[12px] py-1.5 rounded-full var(--text) border transition-colors"
+            style={{
+              color: dark ? "#000" : "#fff",
+              borderColor: "var(--border)",
+              background: dark ? "#fff" : "#F2B5CE",
             }}
-            onMouseLeave={e => {
-              (e.currentTarget as HTMLElement).style.background = "transparent"
-                ; (e.currentTarget as HTMLElement).style.color = "var(--text)"
+            onMouseEnter={(e) => {
+              ; (e.currentTarget as HTMLElement).style.background = dark ? "#f4f4f5" : "#f7d1e0"
+            }}
+            onMouseLeave={(e) => {
+              ; (e.currentTarget as HTMLElement).style.background = dark ? "#fff" : "#F2B5CE"
             }}
           >
             Sign up

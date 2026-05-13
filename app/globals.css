@@ -4,7 +4,7 @@
 :root {
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   --bg:        #ffffff;
-  --text:      #F2B5CE;
+  --text:      #DA0D77;
   --border:    #e5e7eb;
   --muted:     #6b7280;
   --surface:   #f9fafb;
@@ -29,9 +29,18 @@ html {
 
 body {
   background-color: var(--bg);
-  user-select: none;
   color:            var(--text);
   transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+::selection {
+  background-color: #F2B5CE;
+  color: #fff;
+}
+
+.dark ::selection {
+  background-color: #555FBB;
+  color: #fff;
 }
 
 /* ── tailwind dark mode via class ───────────── */
