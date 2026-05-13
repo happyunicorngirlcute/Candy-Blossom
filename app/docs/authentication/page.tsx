@@ -1,21 +1,52 @@
 "use client"
 
-import { useParams } from "next/navigation"
 import { motion } from "framer-motion"
-import { sections } from "../constants"
 import { MethodBadge, CodeBlock } from "../components"
-import { notFound } from "next/navigation"
 
-export default function DocSectionPage() {
-    const params = useParams()
-    const slug = params.slug as string
+const section = {
+    title: "Authentication",
+    slug: "authentication",
+    endpoints: [
+        {
+            method: "POST" as const,
+            path: "/login",
+            description: "Authenticate a user and return a JWT token",
+            body: `{
+  "email": "user@example.com",
+  "password": "password123"
+}`,
+            response: `{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+}`,
+        },
+        {
+            method: "POST" as const,
+            path: "/register",
+            description: "Register a new user account",
+            body: `{
+  "email": "user@example.com",
+  "password": "password123",
+  "firstName": "John",
+  "lastName": "Doe"
+}`,
+            response: `{
+  "message": "I created your account! Check your inbox to verify it",
+  "email": "user@example.com"
+}`,
+        },
+        {
+            method: "GET" as const,
+            path: "/verify-email",
+            description: "Verify a user's email address using a token",
+            pathParams: "token=string",
+            response: `{
+  "message": "I verified your email! You can now log in"
+}`,
+        },
+    ],
+}
 
-    const section = sections.find((s) => s.slug === slug)
-
-    if (!section) {
-        notFound()
-    }
-
+export default function AuthenticationPage() {
     return (
         <motion.div
             initial={{ opacity: 0, y: 10 }}

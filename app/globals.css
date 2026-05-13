@@ -4,7 +4,8 @@
 :root {
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   --bg:        #ffffff;
-  --text:      #DA0D77;
+  --text:      #111827;
+  --accent:    #DA0D77;
   --border:    #e5e7eb;
   --muted:     #6b7280;
   --surface:   #f9fafb;
@@ -13,6 +14,7 @@
 .dark {
   --bg:      #0A0A0C;
   --text:    #F7F8F8;
+  --accent:  #F2B5CE;
   --border:  #1f1f23;
   --muted:   #71717a;
   --surface: #111114;

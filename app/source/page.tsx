@@ -16,7 +16,7 @@ export default function SourcePage() {
                 className="max-w-2xl w-full text-center"
             >
                 <div className="mb-8 flex justify-center">
-                    <div className="p-4 rounded-2xl bg-[var(--surface)] border border-[var(--border)] shadow-xl">
+                    <div className="p-4 rounded-2xl bg-[var(--surface)] border border-[var(--border)]">
                         <svg
                             viewBox="0 0 24 24"
                             className="w-12 h-12 fill-current"
@@ -28,11 +28,11 @@ export default function SourcePage() {
                 </div>
 
                 <h1 className="text-4xl font-extrabold tracking-tight mb-4 text-[var(--text)]">
-                    Candy Blossom Open Source
+                    Candy Blossom's Source Code
                 </h1>
                 
-                <p className="text-lg opacity-60 mb-10 leading-relaxed max-w-lg mx-auto">
-                    We believe in transparency and community. Our entire codebase is open for you to explore, learn from, and contribute to.
+                <p className="text-lg opacity-60 mb-4 leading-relaxed max-w-lg mx-auto">
+                    Our entire frontend codebase is open-source and available on GitHub
                 </p>
 
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -40,16 +40,22 @@ export default function SourcePage() {
                         href={githubUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="group relative px-8 py-4 rounded-full font-bold text-lg transition-all duration-300 transform hover:scale-105"
+                        className="group relative px-5 py-2.5 rounded-full font-semibold text-sm transition-colors duration-300"
                         style={{
                             background: dark ? "#fff" : "#F2B5CE",
                             color: dark ? "#000" : "#fff",
+                        }}
+                        onMouseEnter={(e) => {
+                            e.currentTarget.style.background = dark ? "#e4e4e7" : "#e0a1b9"
+                        }}
+                        onMouseLeave={(e) => {
+                            e.currentTarget.style.background = dark ? "#fff" : "#F2B5CE"
                         }}
                     >
                         <span className="flex items-center gap-2">
                             View on GitHub
                             <svg 
-                                className="w-5 h-5 transition-transform group-hover:translate-x-1" 
+                                className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" 
                                 fill="none" 
                                 viewBox="0 0 24 24" 
                                 stroke="currentColor"
@@ -58,25 +64,6 @@ export default function SourcePage() {
                             </svg>
                         </span>
                     </a>
-
-                    <div className="text-sm font-medium opacity-40">
-                        happyunicorngirlcute / Candy-Blossom
-                    </div>
-                </div>
-
-                <div className="mt-20 grid grid-cols-1 sm:grid-cols-3 gap-8 text-left opacity-70">
-                    <div className="space-y-2">
-                        <div className="text-xs font-bold uppercase tracking-widest opacity-50">Stack</div>
-                        <div className="text-sm">Next.js, TypeScript, Symfony, PHP</div>
-                    </div>
-                    <div className="space-y-2">
-                        <div className="text-xs font-bold uppercase tracking-widest opacity-50">License</div>
-                        <div className="text-sm">MIT License</div>
-                    </div>
-                    <div className="space-y-2">
-                        <div className="text-xs font-bold uppercase tracking-widest opacity-50">Version</div>
-                        <div className="text-sm">0.1.0-alpha</div>
-                    </div>
                 </div>
             </motion.div>
         </div>

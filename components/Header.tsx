@@ -98,10 +98,9 @@ function SunIcon() {
 export default function HeaderDropdown() {
   const router = useRouter()
   const [open, setOpen] = useState(false)
+  const [showPricingPopup, setShowPricingPopup] = useState(false)
   const { dark, toggle } = useTheme()
   const ref = useRef<HTMLDivElement>(null)
-
-  // apply theme to <html>
 
   // close on outside click
   useEffect(() => {
@@ -129,17 +128,28 @@ export default function HeaderDropdown() {
           {[
             { label: "Source", href: "/source", external: false },
             { label: "Docs", href: "/docs", external: false },
-            { label: "Pricing", href: "/pricing", external: false }, // internal optional
+            { label: "Pricing", onClick: () => setShowPricingPopup(true) },
             { label: "Contact", href: "/contact", external: false },
           ].map((item) => (
-            item.external ? (
-              <ExternalNavItem key={item.label} href={item.href}>
+            "onClick" in item ? (
+              <button
+                key={item.label}
+                onClick={item.onClick}
+                className="px-3 py-1.5 rounded-md text-sm transition-colors cursor-pointer"
+                style={{ color: "var(--muted)" }}
+                onMouseEnter={(e) => (e.currentTarget.style.color = "var(--text)")}
+                onMouseLeave={(e) => (e.currentTarget.style.color = "var(--muted)")}
+              >
+                {item.label}
+              </button>
+            ) : item.external ? (
+              <ExternalNavItem key={item.label} href={item.href!}>
                 {item.label}
               </ExternalNavItem>
             ) : (
               <Link
                 key={item.label}
-                href={item.href}
+                href={item.href!}
                 className="px-3 py-1.5 rounded-md text-sm transition-colors"
                 style={{ color: "var(--muted)" }}
                 onMouseEnter={(e) => (e.currentTarget.style.color = "var(--text)")}
@@ -149,6 +159,51 @@ export default function HeaderDropdown() {
               </Link>
             )
           ))}
+
+          {/* Pricing Popup */}
+          <AnimatePresence>
+            {showPricingPopup && (
+              <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  onClick={() => setShowPricingPopup(false)}
+                  className="absolute inset-0 bg-black/20 backdrop-blur-sm"
+                />
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.95, y: 10 }}
+                  className="relative w-full max-w-sm overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-8"
+                >
+                  <div className="text-center">
+                    <h3 className="mb-6 text-xl font-bold text-[var(--text)]">It's completely free!</h3>
+                    <p className="text-sm opacity-60 leading-relaxed">
+                      Candy Blossom's website and application are 100% free to use.
+                      Enjoy taking care of your plants without any cost
+                    </p>
+                    <button
+                      onClick={() => setShowPricingPopup(false)}
+                      className="mt-8 w-full rounded-full px-4 py-2 text-sm font-semibold transition-colors cursor-pointer"
+                      style={{
+                        background: dark ? "#fff" : "#F2B5CE",
+                        color: dark ? "#000" : "#fff",
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.background = dark ? "#e4e4e7" : "#e0a1b9"
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.background = dark ? "#fff" : "#F2B5CE"
+                      }}
+                    >
+                      Got it
+                    </button>
+                  </div>
+                </motion.div>
+              </div>
+            )}
+          </AnimatePresence>
           <div className="relative" ref={ref}>
             <button
               onClick={() => setOpen(!open)}
@@ -162,7 +217,7 @@ export default function HeaderDropdown() {
               <motion.svg
                 animate={{ rotate: open ? 180 : 0 }}
                 transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-                className="w-3.5 h-3.5 opacity-60 cursor-pointer"
+                className={`w-3.5 h-3.5 cursor-pointer ${!dark && open ? "text-white opacity-100" : "opacity-60"}`}
                 fill="none" viewBox="0 0 24 24" stroke="currentColor"
               >
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -182,22 +237,21 @@ export default function HeaderDropdown() {
                     border: "1px solid var(--border)",
                     color: "var(--text)",
                   }}
-                  className="absolute left-1/2 -translate-x-1/2 top-full mt-2 w-[680px] rounded-2xl shadow-2xl z-50 overflow-hidden cursor-pointer"
+                  className="absolute left-1/2 -translate-x-1/2 top-full mt-2 w-[680px] rounded-2xl z-50 overflow-hidden cursor-pointer"
                 >
 
                   <div className="grid grid-cols-3">
                     {products.map((item, i) => (
-                      <motion.a
+                      <Link
                         key={item.label}
-                        href="#"
-                        variants={itemVariants}
-                        className="flex flex-col gap-1 p-5 transition-colors"
+                        href={`/features/${item.label.toLowerCase()}`}
+                        className="flex flex-col gap-1 p-5 transition-colors cursor-pointer"
                         style={{
                           borderRight: i % 3 !== 2 ? "1px solid var(--border)" : "none",
                           borderBottom: i < 3 ? "1px solid var(--border)" : "none",
                         }}
-                        onMouseEnter={e => ((e.currentTarget as HTMLElement).style.background = "var(--border)")}
-                        onMouseLeave={e => ((e.currentTarget as HTMLElement).style.background = "transparent")}
+                        onMouseEnter={e => (e.currentTarget.style.background = "var(--border)")}
+                        onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
                       >
                         <span className="text-xs font-normal" style={{ color: "var(--muted)" }}>
                           {item.label}
@@ -205,18 +259,9 @@ export default function HeaderDropdown() {
                         <span className="text-sm font-semibold leading-snug" style={{ color: "var(--text)" }}>
                           {item.title}
                         </span>
-                      </motion.a>
+                      </Link>
                     ))}
                   </div>
-                  <motion.div
-                    variants={itemVariants}
-                    className="flex items-center justify-between px-5 py-3.5"
-                    style={{ borderTop: "1px solid var(--border)" }}
-                  >
-                    <a href="#" className="text-sm font-medium text-blue-400 hover:text-blue-300 transition-colors">
-                      Changelogs
-                    </a>
-                  </motion.div>
                 </motion.div>
               )}
             </AnimatePresence>

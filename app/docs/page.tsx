@@ -33,7 +33,7 @@ console.log(data);`
                 <h2 className="text-2xl font-bold mb-6">Getting Started</h2>
                 <p className="opacity-70 mb-6 leading-relaxed">
                     You should authentificate in order to use most endpoints.
-                    You can obtain this token by calling the <code className="bg-[var(--surface)] px-1 rounded">/login</code> endpoint.
+                    You can obtain this token by calling the <code className="bg-[var(--surface)] px-1 rounded">/login</code> endpoint
                 </p>
                 <CodeBlock label="Example Request" code={fetchExample} language="javascript" />
             </section>
