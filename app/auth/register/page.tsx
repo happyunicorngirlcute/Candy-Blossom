@@ -23,10 +23,11 @@ export default function AuthRegister() {
     const router = useRouter()
     const [step, setStep] = useState(0)
     const [email, setEmail] = useState("")
-    const [username, setUsername] = useState("")
+    const [name, setName] = useState("")
     const [password, setPassword] = useState("")
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState<string | null>(null)
+    const API = process.env.NEXT_PUBLIC_API_URL
 
     useEffect(() => {
         try {
@@ -34,7 +35,7 @@ export default function AuthRegister() {
             if (stored) {
                 const data = JSON.parse(stored)
                 if (data.email) setEmail(data.email)
-                if (data.username) setUsername(data.username)
+                if (data.name) setName(data.name)
                 if (data.password) setPassword(data.password)
                 if (typeof data.step === 'number') setStep(Math.min(2, data.step))
             }
@@ -43,10 +44,10 @@ export default function AuthRegister() {
 
     useEffect(() => {
         try {
-            const data = { email, username, password, step }
+            const data = { email, name, password, step }
             localStorage.setItem('registerData', JSON.stringify(data))
         } catch { }
-    }, [email, username, password, step])
+    }, [email, name, password, step])
 
     const next = () => setStep((s) => Math.min(2, s + 1))
 
@@ -58,11 +59,11 @@ export default function AuthRegister() {
             const payload = {
                 email,
                 password,
-                firstName: username,
-                lastName: "",
+                name: name,
             }
 
-            const res = await fetch('/register', {
+            const url = `${API}/register`
+            const res = await fetch(url, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload),
@@ -82,18 +83,18 @@ export default function AuthRegister() {
             router.push('/auth/login')
 
         } catch (err) {
-            setError('Network error')
+            setError('My backend seems to not work as intended!')
         } finally {
             setLoading(false)
         }
     }
 
     const emailValid = email.includes('@') && email.includes('.')
-    const usernameValid = username.trim().length >= 3
-    // password: at least 8 chars, at least one letter and one number
-    const passwordValid = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/.test(password)
+    const nameValid = name.trim().length >= 3
+    // password: at least 6 chars
+    const passwordValid = /^.{6,}$/.test(password)
     const passwordLengthOk = password.length >= 8
-    const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
+    const apiBase = process.env.NEXT_PUBLIC_API_URL
 
     return (
         <motion.main className="min-h-screen bg-[var(--bg)] text-[var(--text)] transition-colors"
@@ -104,7 +105,8 @@ export default function AuthRegister() {
 
                     <motion.h1 variants={itemVariants} className="text-3xl font-thin leading-tight">
                         {step === 0 && 'What should I call you?'}
-                        {step === 1 && (username ? `What's your email address, ${username}?` : 'What\'s your email address?')}
+                        {step === 1 && (name ? `What's your email address, ${name
+                            }?` : 'What\'s your email address?')}
                         {step === 2 && 'Your password?'}
                     </motion.h1>
 
@@ -115,17 +117,18 @@ export default function AuthRegister() {
                                     <input
                                         autoFocus
                                         type="text"
-                                        value={username}
-                                        onChange={(e) => setUsername(e.target.value)}
+                                        value={name}
+                                        onChange={(e) => setName(e.target.value)}
                                         className="w-full mx-auto block px-3 py-2 rounded border border-[var(--border)] bg-[var(--surface)] text-sm text-[var(--text)] shadow-sm transition-colors duration-300 ease-out focus:outline-none focus:ring-2 focus:ring-[var(--accent)] focus:ring-offset-2 focus:ring-offset-[var(--bg)] border-animate no-placeholder"
                                     />
 
                                     <button
-                                        disabled={!usernameValid}
+                                        type="button"
+                                        disabled={!nameValid}
                                         onClick={next}
-                                        className={`w-full mx-auto block mt-4 px-3 py-2 rounded-md text-white font-semibold transition-colors duration-150 ${usernameValid ? 'bg-[var(--accent)] cursor-pointer hover:opacity-95' : 'bg-[var(--border)] opacity-60 cursor-not-allowed blocked-animate'}`}
+                                        className={`w-full mx-auto block mt-4 px-3 py-2 rounded-md text-white font-semibold transition-colors duration-150 ${nameValid ? 'bg-[var(--accent)] cursor-pointer hover:opacity-95' : 'bg-[var(--border)] opacity-60 cursor-not-allowed blocked-animate'}`}
                                     >
-                                        Continue
+                                        Next?
                                     </button>
                                 </motion.div>
                             )}
@@ -141,47 +144,57 @@ export default function AuthRegister() {
                                     />
 
                                     <button
+                                        type="button"
                                         disabled={!emailValid}
                                         onClick={next}
                                         className={`w-full mx-auto block mt-4 px-3 py-2 rounded-md text-white font-semibold transition-colors duration-150 ${emailValid ? 'bg-[var(--accent)] cursor-pointer hover:opacity-95' : 'bg-[var(--border)] opacity-60 cursor-not-allowed blocked-animate'}`}
                                     >
-                                        Continue
+                                        Let's verify that
                                     </button>
                                 </motion.div>
                             )}
 
                             {step === 2 && (
-                                <motion.div variants={itemVariants} className="text-center">
-                                    <input
-                                        autoFocus
-                                        type="password"
-                                        value={password}
-                                        onChange={(e) => setPassword(e.target.value)}
-                                        className="w-full mx-auto block px-3 py-2 rounded border border-[var(--border)] bg-[var(--surface)] text-sm text-[var(--text)] shadow-sm transition-colors duration-300 ease-out focus:outline-none focus:ring-2 focus:ring-[var(--accent)] focus:ring-offset-2 focus:ring-offset-[var(--bg)] border-animate no-placeholder"
-                                    />
+                                <form
+                                    onSubmit={(e) => {
+                                        e.preventDefault()
+                                        finish()
+                                    }}
+                                >
+                                    <motion.div variants={itemVariants} className="text-center">
+                                        <input
+                                            autoFocus
+                                            type="password"
+                                            value={password}
+                                            onChange={(e) => setPassword(e.target.value)}
+                                            className="w-full mx-auto block px-3 py-2 rounded border border-[var(--border)] bg-[var(--surface)] text-sm text-[var(--text)] shadow-sm transition-colors duration-300 ease-out focus:outline-none focus:ring-2 focus:ring-[var(--accent)] focus:ring-offset-2 focus:ring-offset-[var(--bg)] border-animate no-placeholder"
+                                        />
 
-                                    {/* validation messages shown below the password input */}
-                                    {!passwordLengthOk && password.length > 0 && (
-                                        <div className="text-yellow-400 text-sm mt-2 text-left">Le mot de passe doit contenir au moins 8 caractères.</div>
-                                    )}
-                                    {password.length > 0 && !/.*[A-Za-z].*/.test(password) && (
-                                        <div className="text-yellow-400 text-sm mt-1 text-left">Le mot de passe doit contenir au moins une lettre.</div>
-                                    )}
-                                    {password.length > 0 && !/.*\d.*/.test(password) && (
-                                        <div className="text-yellow-400 text-sm mt-1 text-left">Le mot de passe doit contenir au moins un chiffre.</div>
-                                    )}
-                                    {error && (
-                                        <div className="text-red-400 text-sm mt-1 text-left">{error}</div>
-                                    )}
+                                        {/* validation messages shown below the password input */}
+                                        {/* {!passwordLengthOk && password.length > 0 && (
+            <div className="text-yellow-400 text-sm mt-2 text-left">
+                Password must contain 6 characters.
+            </div>
+        )} */}
 
-                                    <button
-                                        disabled={!passwordValid || loading}
-                                        onClick={finish}
-                                        className={`w-full mx-auto block mt-4 px-3 py-2 rounded-md text-white font-semibold transition-colors duration-150 ${passwordValid ? 'bg-[var(--accent)] cursor-pointer hover:opacity-95' : 'bg-[var(--border)] opacity-60 cursor-not-allowed blocked-animate'}`}
-                                    >
-                                        {loading ? 'Création…' : 'Create account'}
-                                    </button>
-                                </motion.div>
+                                        {error && (
+                                            <div className="text-[#CA2A30] text-sm mt-2 text-left">
+                                                {error}
+                                            </div>
+                                        )}
+
+                                        <button
+                                            type="submit"
+                                            disabled={!passwordValid || loading}
+                                            className={`w-full mx-auto block mt-4 px-3 py-2 rounded-md text-white font-semibold transition-colors duration-150 ${passwordValid
+                                                    ? 'bg-[var(--accent)] cursor-pointer hover:opacity-95'
+                                                    : 'bg-[var(--border)] opacity-60 cursor-not-allowed blocked-animate'
+                                                }`}
+                                        >
+                                            {loading ? 'Creating...' : 'Create account'}
+                                        </button>
+                                    </motion.div>
+                                </form>
                             )}
                         </div>
                     </div>

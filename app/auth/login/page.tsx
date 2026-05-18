@@ -25,7 +25,7 @@ export default function Login() {
     const [password, setPassword] = useState("")
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState<string | null>(null)
-    const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
+    const API = process.env.NEXT_PUBLIC_API_URL
 
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault()
@@ -83,7 +83,7 @@ export default function Login() {
 
                     <form onSubmit={handleSubmit} className="mt-6 space-y-4 w-full max-w-md mx-auto">
                         <div>
-                            <label className="block text-start text-sm font-medium mb-2 text-[var(--muted)]">Email</label>
+                            <label className="block text-start text-sm font-medium mb-1 text-[var(--muted)]">Email</label>
                             <input
                                 type="email"
                                 name="email"
@@ -94,7 +94,7 @@ export default function Login() {
                         </div>
 
                         <div>
-                            <label className="block text-start text-sm font-medium mb-2 text-[var(--muted)]">Password</label>
+                            <label className="block text-start text-sm font-medium mb-1 text-[var(--muted)]">Password</label>
                             <input
                                 type="password"
                                 name="password"
@@ -103,13 +103,13 @@ export default function Login() {
                                 className="w-full px-3 py-2 rounded border border-[var(--border)] bg-[var(--surface)] text-xs text-[var(--text)] shadow-sm transition-colors duration-300 ease-out focus:outline-none focus:ring-2 focus:ring-[var(--accent)] focus:ring-offset-2 focus:ring-offset-[var(--bg)] border-animate no-placeholder"
                             />
 
-                            {error && <div className="text-red-400 text-sm mt-1 text-left">{error}</div>}
+                            {error && <div className="text-[#CA2A30] text-sm mt-2 mb-2 text-left">{error}</div>}
                         </div>
                         <div>
                             <button
                                 type="submit"
                                 disabled={loading}
-                                className="w-full mt-2 cursor-pointer inline-flex items-center justify-center px-4 py-2 rounded-md bg-[var(--accent)] text-white font-semibold hover:opacity-90"
+                                className="w-full  select-none cursor-pointer inline-flex items-center justify-center px-4 py-2 rounded-md bg-[var(--accent)] text-white font-semibold hover:opacity-90"
                             >
                                 {loading ? 'Signing in…' : 'Enter my home'}
                             </button>

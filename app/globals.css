@@ -41,12 +41,12 @@ body {
 
 ::selection {
   background-color: #F2B5CE;
-  color: #fff;
+  color: #ffffff;
 }
 
 .dark ::selection {
   background-color: #555FBB;
-  color: #fff;
+  color: #ffffff;
 }
 
 /* ── tailwind dark mode via class ───────────── */
