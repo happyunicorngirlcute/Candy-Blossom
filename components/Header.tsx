@@ -293,26 +293,30 @@ export default function HeaderDropdown() {
           {/* divider */}
           <div className="w-px h-4" style={{ background: "var(--border)" }} />
 
-          <a href="#" className="text-sm px-[12px] py-1.5 transition-colors" style={{ color: "var(--muted)" }}
+          <button
+            type="button"
+            onClick={() => router.push('/login')}
+            className="text-sm px-[12px] py-1.5 transition-colors bg-transparent cursor-pointer"
+            style={{ color: "var(--muted)" }}
             onMouseEnter={e => (e.currentTarget.style.color = "var(--text)")}
             onMouseLeave={e => (e.currentTarget.style.color = "var(--muted)")}
           >
             Log in
-          </a>
+          </button>
 
           <a
             href="#"
             className="text-sm font-medium px-[12px] py-1.5 rounded-full var(--text) border transition-colors"
             style={{
-              color: dark ? "#000" : "#fff",
+              color: dark ? "#000000" : "#FFFFFF",
               borderColor: "var(--border)",
-              background: dark ? "#fff" : "#F2B5CE",
+              background: dark ? "#FFFFFF" : "#F2B5CE",
             }}
             onMouseEnter={(e) => {
               ; (e.currentTarget as HTMLElement).style.background = dark ? "#f4f4f5" : "#f7d1e0"
             }}
             onMouseLeave={(e) => {
-              ; (e.currentTarget as HTMLElement).style.background = dark ? "#fff" : "#F2B5CE"
+              ; (e.currentTarget as HTMLElement).style.background = dark ? "#FFFFFF" : "#F2B5CE"
             }}
           >
             Sign up

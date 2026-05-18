@@ -1,37 +1,41 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 @import "tailwindcss";
+
 /* ── theme tokens ───────────────────────────── */
 :root {
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  --bg:        #ffffff;
-  --text:      #111827;
-  --accent:    #DA0D77;
-  --border:    #e5e7eb;
-  --muted:     #6b7280;
-  --surface:   #f9fafb;
+  --bg: #ffffff;
+  --text: #F2B5CE;
+  --accent: #DA0D77;
+  --accent-rgb: 218 13 119;
+  --border: #e5e7eb;
+  --muted: #6b7280;
+  --surface: #f9fafb;
 }
 
 .dark {
-  --bg:      #0A0A0C;
-  --text:    #F7F8F8;
-  --accent:  #F2B5CE;
-  --border:  #1f1f23;
-  --muted:   #71717a;
+  --bg: #0A0A0C;
+  --text: #F7F8F8;
+  --accent: #F2B5CE;
+  --accent-rgb: 242 181 206;
+  --border: #1f1f23;
+  --muted: #71717a;
   --surface: #111114;
 }
 
 /* ── base ───────────────────────────────────── */
 
 html {
-  font-family:             var(--font-sans);
-  -webkit-font-smoothing:  antialiased;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  letter-spacing:          -0.011em;  /* Linear's tight tracking */
+  letter-spacing: -0.011em;
+  /* Linear's tight tracking */
 }
 
 body {
   background-color: var(--bg);
-  color:            var(--text);
+  color: var(--text);
   transition: background-color 0.2s ease, color 0.2s ease;
 }
 
@@ -47,3 +51,23 @@ body {
 
 /* ── tailwind dark mode via class ───────────── */
 @custom-variant dark (&:where(.dark, .dark *));
+
+/* Accent pulse animation for buttons */
+@keyframes accent-pulse {
+  from {
+    box-shadow: 0 0 0 0 rgba(var(--accent-rgb) / 0);
+  }
+
+  to {
+    box-shadow: 0 12px 30px -12px rgba(var(--accent-rgb) / 0.25);
+  }
+}
+
+.btn-animate {
+  animation: accent-pulse 2.8s ease-in-out infinite alternate;
+}
+
+/* Make placeholders invisible if desired */
+.no-placeholder::placeholder {
+  color: transparent;
+}

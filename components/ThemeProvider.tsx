@@ -10,12 +10,32 @@ type ThemeContextType = {
 const ThemeContext = createContext<ThemeContextType | null>(null)
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [dark, setDark] = useState(false)
+  const [dark, setDark] = useState<boolean>(() => {
+    if (typeof window === "undefined") return false
+    try {
+      const stored = localStorage.getItem("theme")
+      if (stored) return stored === "dark"
+      return window.matchMedia?.("(prefers-color-scheme: dark)")?.matches ?? false
+    } catch {
+      return false
+    }
+  })
 
-  const toggle = () => setDark((prev) => !prev)
+  const toggle = () => {
+    setDark((prev) => {
+      const next = !prev
+      try {
+        localStorage.setItem("theme", next ? "dark" : "light")
+      } catch { }
+      document.documentElement.classList.toggle("dark", next)
+      return next
+    })
+  }
 
   useEffect(() => {
-    document.documentElement.classList.toggle("dark", dark)
+    try {
+      document.documentElement.classList.toggle("dark", dark)
+    } catch { }
   }, [dark])
 
   return (

@@ -1,6 +1,5 @@
 "use client"
 
-import { motion } from "framer-motion"
 import { CodeBlock } from "./components"
 
 export default function DocsPage() {
@@ -16,11 +15,7 @@ const data = await response.json();
 console.log(data);`
 
     return (
-        <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4 }}
-        >
+        <div>
             <header className="mb-16">
                 <h1 className="text-4xl font-extrabold tracking-tight mb-4">API Documentation</h1>
                 <p className="text-lg opacity-60 max-w-2xl leading-relaxed">
@@ -37,6 +32,6 @@ console.log(data);`
                 </p>
                 <CodeBlock label="Example Request" code={fetchExample} language="javascript" />
             </section>
-        </motion.div>
+        </div>
     )
 }
