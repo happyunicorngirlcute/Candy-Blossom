@@ -1,6 +1,6 @@
 "use client"
 
-import { motion } from "framer-motion"
+
 import { MethodBadge, CodeBlock } from "../components"
 
 const section = {
@@ -61,11 +61,7 @@ const section = {
 
 export default function PlantsPage() {
     return (
-        <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4 }}
-        >
+        <div>
             <section className="scroll-mt-24">
                 <h2 className="text-3xl font-bold mb-8 pb-2 border-b border-[var(--border)]">
                     {section.title}
@@ -102,6 +98,6 @@ export default function PlantsPage() {
                     ))}
                 </div>
             </section>
-        </motion.div>
+        </div>
     )
 }

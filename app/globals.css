@@ -71,3 +71,44 @@ body {
 .no-placeholder::placeholder {
   color: transparent;
 }
+
+/* Input border slow pulse animation */
+@keyframes border-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(var(--accent-rgb) / 0);
+  }
+
+  50% {
+    box-shadow: 0 6px 18px -10px rgba(var(--accent-rgb) / 0.12);
+  }
+
+  100% {
+    box-shadow: 0 0 0 0 rgba(var(--accent-rgb) / 0);
+  }
+}
+
+.border-animate:focus {
+  animation: border-pulse 2.4s ease-in-out 1;
+}
+
+/* Blocked (disabled) subtle wiggle/glow to indicate required fields */
+@keyframes blocked-shimmer {
+  0% {
+    transform: translateY(0);
+    filter: brightness(1);
+  }
+
+  50% {
+    transform: translateY(-1px);
+    filter: brightness(0.98);
+  }
+
+  100% {
+    transform: translateY(0);
+    filter: brightness(1);
+  }
+}
+
+.blocked-animate {
+  animation: blocked-shimmer 1.2s ease-in-out infinite;
+}

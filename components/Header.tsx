@@ -295,7 +295,7 @@ export default function HeaderDropdown() {
 
           <button
             type="button"
-            onClick={() => router.push('/login')}
+            onClick={() => router.push('/auth/login')}
             className="text-sm px-[12px] py-1.5 transition-colors bg-transparent cursor-pointer"
             style={{ color: "var(--muted)" }}
             onMouseEnter={e => (e.currentTarget.style.color = "var(--text)")}
@@ -304,23 +304,20 @@ export default function HeaderDropdown() {
             Log in
           </button>
 
-          <a
-            href="#"
-            className="text-sm font-medium px-[12px] py-1.5 rounded-full var(--text) border transition-colors"
+          <button
+            type="button"
+            onClick={() => router.push('/auth/register')}
+            className="text-sm font-medium px-[12px] py-1.5 rounded-full border transition-colors cursor-pointer"
             style={{
               color: dark ? "#000000" : "#FFFFFF",
               borderColor: "var(--border)",
               background: dark ? "#FFFFFF" : "#F2B5CE",
             }}
-            onMouseEnter={(e) => {
-              ; (e.currentTarget as HTMLElement).style.background = dark ? "#f4f4f5" : "#f7d1e0"
-            }}
-            onMouseLeave={(e) => {
-              ; (e.currentTarget as HTMLElement).style.background = dark ? "#FFFFFF" : "#F2B5CE"
-            }}
+            onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = dark ? "#f4f4f5" : "#f7d1e0" }}
+            onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = dark ? "#FFFFFF" : "#F2B5CE" }}
           >
             Sign up
-          </a>
+          </button>
         </div>
       </nav>
     </header>
