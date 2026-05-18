@@ -57,7 +57,7 @@ export default function UserCollectionPage() {
                                 <MethodBadge method={endpoint.method} />
                                 <code className="text-lg font-mono font-bold tracking-tight">{endpoint.path}</code>
                                 {endpoint.auth && (
-                                    <span className="text-[10px] uppercase font-bold px-1.5 py-0.5 border border-yellow-500/50 text-yellow-500 rounded">
+                                    <span className="text-[10px] uppercase font-bold px-1.5 py-0.5 border border-yellow-500/50 text-yellow-500 rounded select-none">
                                         Auth
                                     </span>
                                 )}

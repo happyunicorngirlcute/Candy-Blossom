@@ -61,7 +61,7 @@ export default function Login() {
             router.push('/')
 
         } catch (err) {
-            setError('Cannot connect to backend')
+            setError('My server crashed!')
         } finally {
             setLoading(false)
         }
@@ -109,7 +109,7 @@ export default function Login() {
                             <button
                                 type="submit"
                                 disabled={loading}
-                                className="w-full  select-none cursor-pointer inline-flex items-center justify-center px-4 py-2 rounded-md bg-[var(--accent)] text-white font-semibold hover:opacity-90"
+                                className="w-full select-none cursor-pointer inline-flex items-center justify-center px-4 py-2 rounded-md font-semibold transition-colors bg-[var(--text)] text-[var(--bg)] dark:bg-white dark:text-black hover:opacity-90"
                             >
                                 {loading ? 'Signing in…' : 'Enter my home'}
                             </button>

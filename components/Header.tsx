@@ -113,7 +113,7 @@ export default function HeaderDropdown() {
 
   return (
     <header
-      className="fixed top-0 left-0 w-full z-50 flex items-center justify-between pl-88 pr-88 h-16"
+      className="fixed top-0 left-0 w-full z-50 flex select-none items-center justify-between pl-88 pr-88 h-16"
       style={{
         borderBottom: "1px solid var(--border)",
         background: "var(--bg)",

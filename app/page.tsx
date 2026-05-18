@@ -2,6 +2,9 @@
 
 import { motion } from "framer-motion";
 
+import { useSearchParams } from "next/navigation";
+import { Suspense } from "react";
+
 const containerVariants = {
   hidden: { opacity: 0 },
   visible: {
@@ -17,7 +20,10 @@ const itemVariants = {
   visible: { opacity: 1, y: 0 },
 };
 
-export default function Home() {
+function HomeContent() {
+  const searchParams = useSearchParams();
+  const registered = searchParams.get('registered');
+
   return (
     <motion.main
       variants={containerVariants}
@@ -39,5 +45,13 @@ export default function Home() {
       </div>
     </section>
     </motion.main >
-  )
+  );
+}
+
+export default function Home() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <HomeContent />
+    </Suspense>
+  );
 }

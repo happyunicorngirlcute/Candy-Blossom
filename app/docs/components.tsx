@@ -10,7 +10,7 @@ export const MethodBadge = ({ method }: { method: string }) => {
         PUT: "text-yellow-600 bg-yellow-500/10 dark:text-yellow-400",
     }
     return (
-        <span className={`px-2 py-0.5 rounded text-xs font-bold ${colors[method as keyof typeof colors]}`}>
+        <span className={`px-2 py-0.5 rounded text-xs font-bold select-none ${colors[method as keyof typeof colors]}`}>
             {method}
         </span>
     )
