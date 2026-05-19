@@ -2,9 +2,10 @@
 
 import { useState, useRef, useEffect } from "react"
 import { AnimatePresence, motion } from "framer-motion"
-import { useRouter } from "next/navigation"
+import { useRouter, usePathname } from "next/navigation"
 import Link from "next/link"
 import { useTheme } from "@/components/ThemeProvider"
+import { useAuth } from "@/components/AuthProvider"
 
 const products = [
   { label: "Uploading", title: "Name me your plants, I will know how to take care of it" },
@@ -97,9 +98,12 @@ function SunIcon() {
 
 export default function HeaderDropdown() {
   const router = useRouter()
+  const pathname = usePathname()
+  const isDashboard = pathname.startsWith("/dashboard")
   const [open, setOpen] = useState(false)
   const [showPricingPopup, setShowPricingPopup] = useState(false)
   const { dark, toggle } = useTheme()
+  const { isAuthenticated } = useAuth()
   const ref = useRef<HTMLDivElement>(null)
 
   // close on outside click
@@ -290,34 +294,52 @@ export default function HeaderDropdown() {
             </AnimatePresence>
           </motion.button>
 
-          {/* divider */}
           <div className="w-px h-4" style={{ background: "var(--border)" }} />
 
-          <button
-            type="button"
-            onClick={() => router.push('/auth/login')}
-            className="text-sm px-[12px] py-1.5 transition-colors bg-transparent cursor-pointer"
-            style={{ color: "var(--muted)" }}
-            onMouseEnter={e => (e.currentTarget.style.color = "var(--text)")}
-            onMouseLeave={e => (e.currentTarget.style.color = "var(--muted)")}
-          >
-            Log in
-          </button>
+          {isAuthenticated ? (
+            <button
+              type="button"
+              onClick={() => router.push('/dashboard')}
+              className="text-sm font-medium px-[12px] py-1.5 rounded-full border transition-colors cursor-pointer"
+              style={{
+                color: dark ? "#000000" : "#FFFFFF",
+                borderColor: "var(--border)",
+                background: dark ? "#FFFFFF" : "#F2B5CE",
+              }}
+            >
+              Dashboard
+            </button>
+          ) : (
+            !isDashboard && (
+              <>
+                <button
+                  type="button"
+                  onClick={() => router.push('/auth/login')}
+                  className="text-sm px-[12px] py-1.5 transition-colors bg-transparent cursor-pointer"
+                  style={{ color: "var(--muted)" }}
+                  onMouseEnter={e => (e.currentTarget.style.color = "var(--text)")}
+                  onMouseLeave={e => (e.currentTarget.style.color = "var(--muted)")}
+                >
+                  Log in
+                </button>
 
-          <button
-            type="button"
-            onClick={() => router.push('/auth/register')}
-            className="text-sm font-medium px-[12px] py-1.5 rounded-full border transition-colors cursor-pointer"
-            style={{
-              color: dark ? "#000000" : "#FFFFFF",
-              borderColor: "var(--border)",
-              background: dark ? "#FFFFFF" : "#F2B5CE",
-            }}
-            onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = dark ? "#f4f4f5" : "#f7d1e0" }}
-            onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = dark ? "#FFFFFF" : "#F2B5CE" }}
-          >
-            Sign up
-          </button>
+                <button
+                  type="button"
+                  onClick={() => router.push('/auth/register')}
+                  className="text-sm font-medium px-[12px] py-1.5 rounded-full border transition-colors cursor-pointer"
+                  style={{
+                    color: dark ? "#000000" : "#FFFFFF",
+                    borderColor: "var(--border)",
+                    background: dark ? "#FFFFFF" : "#F2B5CE",
+                  }}
+                  onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = dark ? "#f4f4f5" : "#f7d1e0" }}
+                  onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = dark ? "#FFFFFF" : "#F2B5CE" }}
+                >
+                  Sign up
+                </button>
+              </>
+            )
+          )}
         </div>
       </nav>
     </header>

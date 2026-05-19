@@ -3,6 +3,7 @@
 import { useEffect, useState, Suspense } from "react"
 import { useSearchParams, useRouter } from "next/navigation"
 import { motion } from "framer-motion"
+import { fetchBackend } from "@/lib/fetchApi"
 
 const containerVariants = {
     hidden: { opacity: 0 },
@@ -24,7 +25,6 @@ function VerifyEmailContent() {
     const router = useRouter()
     const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading')
     const [message, setMessage] = useState("Verifying your email...")
-    const API = process.env.NEXT_PUBLIC_API_URL
 
     useEffect(() => {
         const token = searchParams.get('token')
@@ -36,7 +36,7 @@ function VerifyEmailContent() {
 
         const verify = async () => {
             try {
-                const res = await fetch(`${API}/verify-email?token=${token}`)
+                const res = await fetchBackend(`/verify-email?token=${token}`)
                 const data = await res.json()
 
                 if (res.ok) {
@@ -55,7 +55,7 @@ function VerifyEmailContent() {
         }
 
         verify()
-    }, [searchParams, API, router])
+    }, [searchParams, router])
 
     return (
         <motion.main
@@ -64,39 +64,10 @@ function VerifyEmailContent() {
             animate="visible"
             className="min-h-screen bg-[var(--bg)] text-[var(--text)] transition-colors flex items-center justify-center"
         >
-            <div className="max-w-md w-full text-center space-y-6 p-8 bg-[var(--surface)] rounded-xl shadow-lg border border-[var(--border)]">
-                <motion.h1 variants={itemVariants} className="text-2xl font-semibold">
-                    Verifying...
-                </motion.h1>
-{/* 
-                <motion.div variants={itemVariants} className="py-4">
-                    {status === 'loading' && (
-                        <div className="flex flex-col items-center gap-4">
-                            <div className="animate-spin h-8 w-8 border-4 border-[var(--accent)] border-t-transparent rounded-full"></div>
-                            <p className="text-[var(--muted)]">{message}</p>
-                        </div>
-                    )}
-
-                    {status === 'success' && (
-                        <div className="space-y-4">
-                            <p className="text-sm text-[var(--muted)]">Redirecting to login...</p>
-                        </div>
-                    )}
-
-                    {status === 'error' && (
-                        <div className="space-y-4">
-                            <div className="text-red-500 text-5xl">✕</div>
-                            <p className="text-[var(--text)]">{message}</p>
-                            <button 
-                                onClick={() => router.push('/auth/register')}
-                                className="mt-4 px-4 py-2 font-semibold rounded bg-[var(--text)] text-[var(--bg)] dark:bg-white dark:text-black hover:opacity-90 transition-opacity"
-                            >
-                                Back to Registration
-                            </button>
-                        </div>
-                    )}
-                </motion.div> */}
-            </div>
+            <motion.h1 variants={itemVariants} className="text-4xl font-thin leading-tight text-center">
+                Verifying... {status === 'success' && "Success!"}
+                {status === 'error' && "Give it a moment?"}
+            </motion.h1>
         </motion.main>
     )
 }

@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { motion } from "framer-motion"
 import { useRouter } from "next/navigation"
+import { useAuth } from "@/components/AuthProvider"
 
 const containerVariants = {
     hidden: { opacity: 0 },
@@ -26,6 +27,7 @@ export default function Login() {
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState<string | null>(null)
     const API = process.env.NEXT_PUBLIC_API_URL
+    const { login } = useAuth()
 
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault()
@@ -55,10 +57,9 @@ export default function Login() {
             }
 
             // store token and basic user info
-            if (data.token) try { localStorage.setItem('token', data.token) } catch { }
-            if (data.user) try { localStorage.setItem('user', JSON.stringify(data.user)) } catch { }
+            if (data.token && data.user) login(data.token, JSON.stringify(data.user))
 
-            router.push('/')
+            router.push('/dashboard')
 
         } catch (err) {
             setError('My server crashed!')
@@ -111,7 +112,7 @@ export default function Login() {
                                 disabled={loading}
                                 className="w-full select-none cursor-pointer inline-flex items-center justify-center px-4 py-2 rounded-md font-semibold transition-colors bg-[var(--text)] text-[var(--bg)] dark:bg-white dark:text-black hover:opacity-90"
                             >
-                                {loading ? 'Signing in…' : 'Enter my home'}
+                                {loading ? 'Welcoming you...' : 'Enter my home'}
                             </button>
                         </div>
                     </form>

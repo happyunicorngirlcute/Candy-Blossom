@@ -1,9 +1,11 @@
 "use client"
 
 import { motion } from "framer-motion";
+import { Suspense, useEffect } from "react";
 
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/components/AuthProvider";
 import { useSearchParams } from "next/navigation";
-import { Suspense } from "react";
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -23,6 +25,14 @@ const itemVariants = {
 function HomeContent() {
   const searchParams = useSearchParams();
   const registered = searchParams.get('registered');
+  const router = useRouter();
+  const { isAuthenticated, loading } = useAuth();
+
+  useEffect(() => {
+    if (!loading && isAuthenticated) {
+      router.push('/dashboard');
+    }
+  }, [isAuthenticated, loading, router]);
 
   return (
     <motion.main
@@ -42,8 +52,8 @@ function HomeContent() {
             We provide care instructions for your plants based on their species, current health status, weather, when to water, and much more! Just upload a photo of your plant, and we'll take care of the rest!
           </motion.p>
 
-      </div>
-    </section>
+        </div>
+      </section>
     </motion.main >
   );
 }

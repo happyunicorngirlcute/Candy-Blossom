@@ -3,6 +3,8 @@
 import { useState, Suspense } from "react"
 import { motion } from "framer-motion"
 import { useRouter, useSearchParams } from "next/navigation"
+import { useAuth } from "@/components/AuthProvider"
+import { fetchBackend } from "@/lib/fetchApi"
 
 const containerVariants = {
     hidden: { opacity: 0 },
@@ -26,7 +28,7 @@ function RegisterPasswordContent() {
     const [password, setPassword] = useState("")
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState<string | null>(null)
-    const API = process.env.NEXT_PUBLIC_API_URL
+    const { login } = useAuth()
 
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault()
@@ -34,12 +36,12 @@ function RegisterPasswordContent() {
             setError("Email is missing. Please try the registration again.")
             return
         }
-        
+
         setError(null)
         setLoading(true)
 
         try {
-            const res = await fetch(`${API}/register/complete`, {
+            const res = await fetchBackend('/register/complete', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, password }),
@@ -53,7 +55,13 @@ function RegisterPasswordContent() {
                 return
             }
 
-            // Success: Redirect to landing page with success message
+            if (data.token && data.user) {
+                login(data.token, JSON.stringify(data.user))
+                router.push('/dashboard')
+                return
+            }
+
+            // fallback: Redirect to landing page with success message
             router.push('/?registered=true')
 
         } catch (err) {
@@ -93,8 +101,8 @@ function RegisterPasswordContent() {
                             type="submit"
                             disabled={!passwordValid || loading}
                             className={`w-full mt-4 px-3 py-2 rounded-md font-semibold transition-colors 
-                                ${passwordValid 
-                                    ? 'bg-[var(--text)] text-[var(--bg)] dark:bg-white dark:text-black cursor-pointer hover:opacity-95' 
+                                ${passwordValid
+                                    ? 'bg-[var(--text)] text-[var(--bg)] dark:bg-white dark:text-black cursor-pointer hover:opacity-95'
                                     : 'bg-[var(--border)] text-[var(--muted)] opacity-60 cursor-not-allowed'
                                 }`}
                         >

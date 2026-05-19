@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
 import { useRouter } from "next/navigation"
+import { fetchBackend } from "@/lib/fetchApi"
 
 const containerVariants = {
     hidden: { opacity: 0 },
@@ -27,7 +28,6 @@ export default function AuthRegister() {
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState<string | null>(null)
     const [sent, setSent] = useState(false)
-    const API = process.env.NEXT_PUBLIC_API_URL
 
     useEffect(() => {
         try {
@@ -57,11 +57,10 @@ export default function AuthRegister() {
         try {
             const payload = {
                 email,
-                name: name,
+                name,
             }
 
-            const url = `${API}/register/initiate`
-            const res = await fetch(url, {
+            const res = await fetchBackend('/register/initiate', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload),
@@ -76,7 +75,6 @@ export default function AuthRegister() {
             }
 
             setSent(true)
-            try { localStorage.removeItem('registerData') } catch { }
 
         } catch (err) {
             setError('My backend seems to not work as intended!')
@@ -120,8 +118,8 @@ export default function AuthRegister() {
                                                 disabled={!nameValid}
                                                 onClick={next}
                                                 className={`w-full mx-auto block mt-4 px-3 py-2 rounded-md font-semibold transition-colors duration-150 
-                                                    ${nameValid 
-                                                        ? 'bg-[var(--text)] text-[var(--bg)] dark:bg-white dark:text-black cursor-pointer hover:opacity-95' 
+                                                    ${nameValid
+                                                        ? 'bg-[var(--text)] text-[var(--bg)] dark:bg-white dark:text-black cursor-pointer hover:opacity-95'
                                                         : 'bg-[var(--border)] text-[var(--muted)] opacity-60 cursor-not-allowed blocked-animate'
                                                     }`}
                                             >
@@ -147,13 +145,10 @@ export default function AuthRegister() {
                                             )}
 
                                             <button
-                                                type="button"
-                                                disabled={!emailValid || loading}
                                                 onClick={verifyEmail}
-                                                className={`w-full mx-auto block mt-4 px-3 py-2 rounded-md font-semibold transition-colors duration-150 
-                                                    ${emailValid 
-                                                        ? 'bg-[var(--text)] text-[var(--bg)] dark:bg-white dark:text-black cursor-pointer hover:opacity-95' 
-                                                        : 'bg-[var(--border)] text-[var(--muted)] opacity-60 cursor-not-allowed blocked-animate'
+                                                className={`w-full mx-auto block mt-4 px-3 py-2 rounded-md font-semibold transition-colors duration-150 ${emailValid
+                                                    ? 'bg-[var(--text)] text-[var(--bg)] dark:bg-white dark:text-black cursor-pointer hover:opacity-95'
+                                                    : 'bg-[var(--border)] text-[var(--muted)] opacity-60 cursor-not-allowed blocked-animate'
                                                     }`}
                                             >
                                                 {loading ? (
@@ -169,11 +164,9 @@ export default function AuthRegister() {
                             </div>
                         </>
                     ) : (
-                        <motion.div variants={itemVariants} className="space-y-4">     
-                            <h1 className="text-4xl font-thin leading-tight">
-                               {name}. Cool name! Check your inbox<br/>
-                            </h1>
-                        </motion.div>
+
+                        <h1 className="text-4xl font-thin leading-tight"> {name}. That's a cool name! Check your inbox</h1>
+
                     )}
 
                 </div>
