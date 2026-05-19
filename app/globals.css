@@ -1,9 +1,12 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300..700;1,14..32,300..700&display=swap');
 @import "tailwindcss";
 
 /* ── theme tokens ───────────────────────────── */
 :root {
-  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  /* Linear's exact font stack — SF Pro on Mac, Inter everywhere else */
+  --font-sans: "Inter UI", "SF Pro Display", -apple-system, BlinkMacSystemFont,
+    "Inter", system-ui, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell,
+    "Helvetica Neue", sans-serif;
   --bg: #ffffff;
   --text: #F2B5CE;
   --accent: #DA0D77;
@@ -27,11 +30,17 @@
 
 html {
   font-family: var(--font-sans);
+  font-size: 13px;
+  /* Linear's base size — slightly smaller than typical 16px */
+  font-optical-sizing: auto;
+  /* Drop the cv11 alternate — Linear uses the standard double-story 'a' */
+  font-feature-settings: 'cv02', 'cv03', 'cv04', 'ss01';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  letter-spacing: -0.011em;
-  /* Linear's tight tracking */
+    letter-spacing: -0.014em;
 }
+
+/* ... rest unchanged ... */
 
 body {
   background-color: var(--bg);

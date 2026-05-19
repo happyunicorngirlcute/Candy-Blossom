@@ -123,7 +123,7 @@ export default function HeaderDropdown() {
         background: "var(--bg)",
       }}
     >
-      <div className="flex items-center font-semibold text-sm cursor-pointer" onClick={() => router.push("/")} style={{ color: "var(--text)" }}>
+      <div className="flex items-center font-semibold text-md cursor-pointer" onClick={() => router.push("/")} style={{ color: "var(--text)" }}>
         Candy Blossom
       </div>
 
@@ -139,7 +139,7 @@ export default function HeaderDropdown() {
               <button
                 key={item.label}
                 onClick={item.onClick}
-                className="px-3 py-1.5 rounded-md text-sm transition-colors cursor-pointer"
+                className="px-3 py-1.5 rounded-md text-[13px] leading-none inline-flex items-center transition-colors cursor-pointer"
                 style={{ color: "var(--muted)" }}
                 onMouseEnter={(e) => (e.currentTarget.style.color = "var(--text)")}
                 onMouseLeave={(e) => (e.currentTarget.style.color = "var(--muted)")}
@@ -154,7 +154,7 @@ export default function HeaderDropdown() {
               <Link
                 key={item.label}
                 href={item.href!}
-                className="px-3 py-1.5 rounded-md text-sm transition-colors"
+                className="px-3 py-1.5 rounded-md text-md transition-colors"
                 style={{ color: "var(--muted)" }}
                 onMouseEnter={(e) => (e.currentTarget.style.color = "var(--text)")}
                 onMouseLeave={(e) => (e.currentTarget.style.color = "var(--muted)")}
@@ -183,13 +183,13 @@ export default function HeaderDropdown() {
                 >
                   <div className="text-center">
                     <h3 className="mb-6 text-xl font-bold text-[var(--text)]">It's completely free!</h3>
-                    <p className="text-sm opacity-60 leading-relaxed">
+                    <p className="text-md opacity-60 leading-relaxed">
                       Candy Blossom's website and application are 100% free to use.
                       Enjoy taking care of your plants without any cost
                     </p>
                     <button
                       onClick={() => setShowPricingPopup(false)}
-                      className="mt-8 w-full rounded-full px-4 py-2 text-sm font-semibold transition-colors cursor-pointer"
+                      className="mt-8 w-full rounded-full px-4 py-2 text-md font-semibold transition-colors cursor-pointer"
                       style={{
                         background: dark ? "#fff" : "#F2B5CE",
                         color: dark ? "#000" : "#fff",
@@ -211,7 +211,7 @@ export default function HeaderDropdown() {
           <div className="relative" ref={ref}>
             <button
               onClick={() => setOpen(!open)}
-              className="flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium transition-colors cursor-pointer"
+              className="flex items-center gap-1 px-3 py-1 rounded-full text-md font-medium transition-colors cursor-pointer"
               style={{
                 color: open ? "var(--bg)" : "var(--text)",
                 background: open ? "var(--text)" : "transparent",
@@ -257,10 +257,10 @@ export default function HeaderDropdown() {
                         onMouseEnter={e => (e.currentTarget.style.background = "var(--border)")}
                         onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
                       >
-                        <span className="text-xs font-normal" style={{ color: "var(--muted)" }}>
+                        <span className="text-sm font-normal" style={{ color: "var(--muted)" }}>
                           {item.label}
                         </span>
-                        <span className="text-sm font-semibold leading-snug" style={{ color: "var(--text)" }}>
+                        <span className="text-md font-semibold leading-snug" style={{ color: "var(--text)" }}>
                           {item.title}
                         </span>
                       </Link>
@@ -300,7 +300,7 @@ export default function HeaderDropdown() {
             <button
               type="button"
               onClick={() => router.push('/dashboard')}
-              className="text-sm font-medium px-[12px] py-1.5 rounded-full border transition-colors cursor-pointer"
+              className="text-md font-medium px-[12px] py-1.5 rounded-full border transition-colors cursor-pointer"
               style={{
                 color: dark ? "#000000" : "#FFFFFF",
                 borderColor: "var(--border)",
@@ -315,7 +315,7 @@ export default function HeaderDropdown() {
                 <button
                   type="button"
                   onClick={() => router.push('/auth/login')}
-                  className="text-sm px-[12px] py-1.5 transition-colors bg-transparent cursor-pointer"
+                  className="text-md px-[12px] py-1.5 transition-colors bg-transparent cursor-pointer"
                   style={{ color: "var(--muted)" }}
                   onMouseEnter={e => (e.currentTarget.style.color = "var(--text)")}
                   onMouseLeave={e => (e.currentTarget.style.color = "var(--muted)")}
@@ -326,7 +326,7 @@ export default function HeaderDropdown() {
                 <button
                   type="button"
                   onClick={() => router.push('/auth/register')}
-                  className="text-sm font-medium px-[12px] py-1.5 rounded-full border transition-colors cursor-pointer"
+                  className="text-md font-medium px-[12px] py-1.5 rounded-full border transition-colors cursor-pointer"
                   style={{
                     color: dark ? "#000000" : "#FFFFFF",
                     borderColor: "var(--border)",

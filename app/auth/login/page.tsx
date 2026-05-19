@@ -78,30 +78,30 @@ export default function Login() {
             <section className="min-h-screen flex items-center justify-center px-6">
                 <div className="max-w-4xl text-center space-y-6">
 
-                    <motion.h1 variants={itemVariants} className="text-3xl font-thin leading-tight">
+                    <motion.h1 variants={itemVariants} className="text-4xl font-thin leading-tight">
                         Log in to Candy Blossom
                     </motion.h1>
 
                     <form onSubmit={handleSubmit} className="mt-6 space-y-4 w-full max-w-md mx-auto">
                         <div>
-                            <label className="block text-start text-sm font-medium mb-1 text-[var(--muted)]">Email</label>
+                            <label className="block text-start text-sm font-medium mb-3 text-[var(--muted)]">Email</label>
                             <input
                                 type="email"
                                 name="email"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
-                                className="w-full px-3 py-2 rounded border border-[var(--border)] bg-[var(--surface)] text-xs text-[var(--text)] shadow-sm transition-colors duration-300 ease-out focus:outline-none focus:ring-2 focus:ring-[var(--accent)] focus:ring-offset-2 focus:ring-offset-[var(--bg)] border-animate no-placeholder"
+                                className="w-full px-3 py-2 rounded border border-[var(--border)] bg-[var(--surface)] text-sm text-[var(--text)] shadow-sm transition-colors duration-300 ease-out focus:outline-none focus:ring-2 focus:ring-[var(--accent)] focus:ring-offset-2 focus:ring-offset-[var(--bg)] border-animate no-placeholder"
                             />
                         </div>
 
                         <div>
-                            <label className="block text-start text-sm font-medium mb-1 text-[var(--muted)]">Password</label>
+                            <label className="block text-start text-sm font-medium mb-3 text-[var(--muted)]">Password</label>
                             <input
                                 type="password"
                                 name="password"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
-                                className="w-full px-3 py-2 rounded border border-[var(--border)] bg-[var(--surface)] text-xs text-[var(--text)] shadow-sm transition-colors duration-300 ease-out focus:outline-none focus:ring-2 focus:ring-[var(--accent)] focus:ring-offset-2 focus:ring-offset-[var(--bg)] border-animate no-placeholder"
+                                className="w-full px-3 py-2 rounded border border-[var(--border)] bg-[var(--surface)] text-sm text-[var(--text)] shadow-sm transition-colors duration-300 ease-out focus:outline-none focus:ring-2 focus:ring-[var(--accent)] focus:ring-offset-2 focus:ring-offset-[var(--bg)] border-animate no-placeholder"
                             />
 
                             {error && <div className="text-[#CA2A30] text-sm mt-2 mb-2 text-left">{error}</div>}
