@@ -17,13 +17,13 @@
 }
 
 .dark {
-  --bg: #0A0A0C;
-  --text: #F7F8F8;
-  --accent: #F2B5CE;
+  --bg: #08080a;
+  --text: #f7f8f8;
+  --accent: #f2b5ce;
   --accent-rgb: 242 181 206;
-  --border: #1f1f23;
-  --muted: #71717a;
-  --surface: #111114;
+  --border: #16161a;
+  --muted: #8a8f98;
+  --surface: #111113;
 }
 
 /* ── base ───────────────────────────────────── */

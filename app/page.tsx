@@ -28,12 +28,6 @@ function HomeContent() {
   const router = useRouter();
   const { isAuthenticated, loading } = useAuth();
 
-  useEffect(() => {
-    if (!loading && isAuthenticated) {
-      router.push('/dashboard');
-    }
-  }, [isAuthenticated, loading, router]);
-
   return (
     <motion.main
       variants={containerVariants}
