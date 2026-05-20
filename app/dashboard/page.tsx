@@ -49,18 +49,45 @@ export default function OverviewPage({ userName }: OverviewPageProps) {
 
       const storedUser = localStorage.getItem("user")
       if (storedUser) {
-        setLocalUserName(storedUser)
+        try {
+          const parsed = JSON.parse(storedUser)
+          if (parsed && typeof parsed === "object" && parsed.name) {
+            setLocalUserName(parsed.name)
+          } else {
+            setLocalUserName(storedUser)
+          }
+        } catch {
+          setLocalUserName(storedUser)
+        }
       }
 
       try {
-        const res = await fetch(`${API}/user/plants`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        })
-        const data = await res.json()
+        const [plantsRes, meRes] = await Promise.all([
+          fetch(`${API}/user/plants`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }),
+          fetch(`${API}/user/me`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }).catch((err) => {
+            console.error("Failed to fetch user profile:", err)
+            return null
+          }),
+        ])
 
-        if (!res.ok) {
+        if (meRes && meRes.ok) {
+          const meData = await meRes.json()
+          if (meData && meData.name) {
+            setLocalUserName(meData.name)
+          }
+        }
+
+        const data = await plantsRes.json()
+
+        if (!plantsRes.ok) {
           setError(data.error || data.message || "Unable to load your plants.")
           return
         }
@@ -113,22 +140,7 @@ export default function OverviewPage({ userName }: OverviewPageProps) {
   }, [API, router])
 
   // Generate data for the Linear bar chart
-  // If the user has few plants, mix in high-quality demo plants to keep the interface looking visually spectacular!
   const getChartData = () => {
-    const defaultChartPlants = [
-      { name: "Monstera", moisture: 80, wateringVal: 60, sunVal: 40, color: "var(--accent)" },
-      { name: "Snake Plant", moisture: 30, wateringVal: 20, sunVal: 70, color: "#eab308" },
-      { name: "Boston Fern", moisture: 95, wateringVal: 80, sunVal: 30, color: "#8b5cf6" },
-      { name: "Peace Lily", moisture: 70, wateringVal: 50, sunVal: 35, color: "#3b82f6" },
-      { name: "Rose", moisture: 60, wateringVal: 55, sunVal: 90, color: "#ef4444" },
-      { name: "Aloe Vera", moisture: 25, wateringVal: 15, sunVal: 85, color: "#10b981" },
-      { name: "Fiddle Leaf", moisture: 55, wateringVal: 45, sunVal: 50, color: "#ec4899" },
-    ]
-
-    if (plants.length === 0) {
-      return defaultChartPlants
-    }
-
     // Map user plants
     const userChartData = plants.map((item) => {
       const p = item.plant
@@ -177,12 +189,6 @@ export default function OverviewPage({ userName }: OverviewPageProps) {
       }
     })
 
-    // If less than 4 plants, append a few standard demo plants so the graph looks gorgeous
-    if (userChartData.length < 5) {
-      const needed = 6 - userChartData.length
-      return [...userChartData, ...defaultChartPlants.slice(0, needed)]
-    }
-
     return userChartData
   }
 
@@ -229,7 +235,19 @@ export default function OverviewPage({ userName }: OverviewPageProps) {
     }
   }
 
-  const displayName = userName || localUserName || "there"
+  const getCleanName = (rawName: string) => {
+    if (!rawName) return "there"
+    if (rawName.trim().startsWith("{")) {
+      try {
+        const parsed = JSON.parse(rawName)
+        return parsed.name || "there"
+      } catch {
+        return rawName
+      }
+    }
+    return rawName
+  }
+  const displayName = userName || getCleanName(localUserName)
 
   return (
     <div className="p-8 max-w-7xl mx-auto flex flex-col gap-8 min-h-screen text-[var(--text)]">
@@ -238,8 +256,9 @@ export default function OverviewPage({ userName }: OverviewPageProps) {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold tracking-tight text-[var(--text)]">Hey there, {displayName}</h1>
-          
+            <h1 className="text-2xl font-bold tracking-tight text-[var(--text)]">
+              {displayName} is back. Welcome to my home
+            </h1>
           </div>
         </div>
       </div>
@@ -260,22 +279,22 @@ export default function OverviewPage({ userName }: OverviewPageProps) {
           {/* Top Metrics Row (Linear style) */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             
-            <div className="p-6 border border-[var(--border)] rounded-2xl bg-[var(--surface)] flex flex-col justify-between transition-all hover:border-[var(--muted)]/30 relative overflow-hidden group">
+            <div className="p-6 border border-[var(--muted)]/30 hover:border-[var(--muted)]/60 rounded-2xl bg-[var(--surface)] flex flex-col justify-between transition-all relative overflow-hidden group select-none">
               <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-[var(--accent)]/60 to-transparent transition-opacity" />
               <h3 className="text-xs uppercase tracking-wider font-semibold text-[var(--muted)]">Plants in Collection</h3>
               <div className="flex items-baseline gap-2 mt-4">
-                <span className="text-4xl font-extrabold tracking-tight text-white">{plantCount ?? 0}</span>
-                <span className="text-sm text-[var(--muted)]">species cataloged</span>
+                <span className="text-4xl font-semibold tracking-tight text-white">{plantCount ?? 0}</span>
+                <span className="text-sm text-[var(--muted)]">species</span>
               </div>
             </div>
 
-            <div className="p-6 border border-[var(--border)] rounded-2xl bg-[var(--surface)] flex flex-col justify-between transition-all hover:border-[var(--muted)]/30 relative overflow-hidden group">
+            <div className="p-6 border border-[var(--muted)]/30 hover:border-[var(--muted)]/60 rounded-2xl bg-[var(--surface)] flex flex-col justify-between transition-all relative overflow-hidden group select-none">
               <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-blue-500/60 to-transparent transition-opacity" />
-              <h3 className="text-xs uppercase tracking-wider font-semibold text-[var(--muted)]">Upcoming Care Needed</h3>
+              <h3 className="text-xs uppercase tracking-wider font-semibold text-[var(--muted)]">Care Needed</h3>
               <div className="flex items-baseline gap-3 mt-4">
-                <span className="text-4xl font-extrabold tracking-tight text-white">{upcomingTasks ?? 0}</span>
+                <span className="text-4xl font-semibold tracking-tight text-white">{upcomingTasks ?? 0}</span>
                 {overdueTasks > 0 && (
-                  <span className="text-xs font-bold bg-red-500/10 text-red-400 px-2 py-0.5 rounded-full border border-red-500/20">
+                  <span className="text-xs font-semibold bg-red-500/10 text-red-400 px-2 py-0.5 rounded-full border border-red-500/20">
                     {overdueTasks} overdue!
                   </span>
                 )}
@@ -283,11 +302,11 @@ export default function OverviewPage({ userName }: OverviewPageProps) {
               </div>
             </div>
 
-            <div className="p-6 border border-[var(--border)] rounded-2xl bg-[var(--surface)] flex flex-col justify-between transition-all hover:border-[var(--muted)]/30 relative overflow-hidden group">
+            <div className="p-6 border border-[var(--muted)]/30 hover:border-[var(--muted)]/60 rounded-2xl bg-[var(--surface)] flex flex-col justify-between transition-all relative overflow-hidden group select-none">
               <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-green-500/60 to-transparent transition-opacity" />
               <h3 className="text-xs uppercase tracking-wider font-semibold text-[var(--muted)]">Garden Hydration Score</h3>
               <div className="flex items-baseline gap-2 mt-4">
-                <span className="text-4xl font-extrabold tracking-tight text-green-400">{hydrationScore}%</span>
+                <span className="text-4xl font-semibold tracking-tight text-green-400">{hydrationScore}%</span>
                 <span className="text-sm text-[var(--muted)]">{hydrationScore > 85 ? "Optimal hydration" : "Needs attention"}</span>
               </div>
             </div>
@@ -298,15 +317,14 @@ export default function OverviewPage({ userName }: OverviewPageProps) {
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
             
             {/* Left Area: Custom CSS vertical bar chart (3/5 width) */}
-            <div className="p-6 border border-[var(--border)] rounded-2xl bg-[var(--surface)] lg:col-span-3 flex flex-col justify-between relative overflow-hidden group transition-all hover:border-[var(--muted)]/30">
+            <div className="p-6 border border-[var(--muted)]/30 hover:border-[var(--muted)]/60 rounded-2xl bg-[var(--surface)] lg:col-span-3 flex flex-col justify-between relative overflow-hidden group transition-all">
               <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-purple-500/60 to-transparent transition-opacity" />
-              <div>
-                <h3 className="text-sm font-bold text-white mb-1">Watering Timelines & Requirements</h3>
-                <p className="text-[var(--muted)] text-xs mb-6">Stacked analysis representing moisture levels (solid bottom), base water need (middle), and sunlight intake (top).</p>
+              <div className="select-none">
+                <h3 className="text-sm font-bold text-[var(--muted)] mb-1">Watering Timelines & Requirements</h3>
               </div>
 
               {/* Stacked Vertical Bar Chart */}
-              <div className="h-64 flex items-end justify-between px-2 gap-4 mt-4 relative border-b border-[var(--border)] pb-2">
+              <div className="h-64 flex items-end justify-between px-2 gap-4 mt-4 relative border-b border-[var(--border)] pb-2 select-none">
                 
                 {/* Horizontal Guide Lines */}
                 <div className="absolute inset-0 flex flex-col justify-between pointer-events-none opacity-10">
@@ -316,52 +334,59 @@ export default function OverviewPage({ userName }: OverviewPageProps) {
                   <div className="border-t border-white w-full h-0" />
                 </div>
 
-                {chartData.map((item, idx) => (
-                  <div key={idx} className="flex-1 flex flex-col items-center group/bar relative">
-                    
-                    {/* Hover Tooltip Details */}
-                    <div className="absolute bottom-full mb-2 bg-black/90 border border-[var(--border)] text-xs text-white rounded-lg p-3 shadow-2xl opacity-0 group-hover/bar:opacity-100 transition-all z-20 pointer-events-none w-40 leading-relaxed scale-95 group-hover/bar:scale-100 origin-bottom">
-                      <p className="font-bold border-b border-white/10 pb-1 mb-1 text-[var(--accent)]">{item.name}</p>
-                      <p className="flex justify-between"><span>Moisture:</span> <span className="font-bold">{item.moisture}%</span></p>
-                      <p className="flex justify-between"><span>Water Need:</span> <span className="font-bold">{item.wateringVal}%</span></p>
-                      <p className="flex justify-between"><span>Sunlight:</span> <span className="font-bold">{item.sunVal}%</span></p>
-                    </div>
-
-                    {/* Stacked Bar Container */}
-                    <div className="w-6 md:w-8 h-48 bg-white/5 rounded-t-lg overflow-hidden flex flex-col justify-end gap-[2px] transition-all hover:bg-white/10 cursor-pointer">
-                      
-                      {/* Top Stack Element: Sunlight (Yellow segment) */}
-                      <div 
-                        className="w-full bg-yellow-500/40 hover:bg-yellow-500/60 transition-colors"
-                        style={{ height: `${(item.sunVal / 240) * 100}%` }}
-                      />
-                      
-                      {/* Middle Stack Element: Water Volume Need (Purple segment) */}
-                      <div 
-                        className="w-full bg-purple-500/40 hover:bg-purple-500/60 transition-colors"
-                        style={{ height: `${(item.wateringVal / 240) * 100}%` }}
-                      />
-
-                      {/* Solid Bottom Stack Element: Current Moisture (Accent colored segment) */}
-                      <div 
-                        className="w-full rounded-t-sm transition-all"
-                        style={{ 
-                          height: `${(item.moisture / 240) * 100}%`,
-                          backgroundColor: item.color 
-                        }}
-                      />
-
-                    </div>
-
-                    <span className="text-[10px] mt-2 font-bold tracking-tight text-[var(--muted)] group-hover/bar:text-white transition-colors truncate max-w-full text-center">
-                      {item.name}
-                    </span>
+                {chartData.length === 0 ? (
+                  <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
+                    <p className="text-[var(--muted)] text-xs">No plant analytics available</p>
+                    <p className="text-[var(--muted)] text-[10px] opacity-75">Add plants to see their water and sunlight needs.</p>
                   </div>
-                ))}
+                ) : (
+                  chartData.map((item, idx) => (
+                    <div key={idx} className="flex-1 flex flex-col items-center group/bar relative">
+                      
+                      {/* Hover Tooltip Details */}
+                      <div className="absolute bottom-full mb-2 bg-black/90 border border-[var(--border)] text-xs text-white rounded-lg p-3 shadow-2xl opacity-0 group-hover/bar:opacity-100 transition-all z-20 pointer-events-none w-40 leading-relaxed scale-95 group-hover/bar:scale-100 origin-bottom select-none">
+                        <p className="font-bold border-b border-white/10 pb-1 mb-1 text-[var(--accent)]">{item.name}</p>
+                        <p className="flex justify-between"><span>Moisture:</span> <span className="font-bold">{item.moisture}%</span></p>
+                        <p className="flex justify-between"><span>Water Need:</span> <span className="font-bold">{item.wateringVal}%</span></p>
+                        <p className="flex justify-between"><span>Sunlight:</span> <span className="font-bold">{item.sunVal}%</span></p>
+                      </div>
+
+                      {/* Stacked Bar Container */}
+                      <div className="w-6 md:w-8 h-48 bg-white/5 rounded-t-lg overflow-hidden flex flex-col justify-end gap-[2px] transition-all hover:bg-white/10 cursor-pointer">
+                        
+                        {/* Top Stack Element: Sunlight (Yellow segment) */}
+                        <div 
+                          className="w-full bg-yellow-500/40 hover:bg-yellow-500/60 transition-colors"
+                          style={{ height: `${(item.sunVal / 240) * 100}%` }}
+                        />
+                        
+                        {/* Middle Stack Element: Water Volume Need (Purple segment) */}
+                        <div 
+                          className="w-full bg-purple-500/40 hover:bg-purple-500/60 transition-colors"
+                          style={{ height: `${(item.wateringVal / 240) * 100}%` }}
+                        />
+
+                        {/* Solid Bottom Stack Element: Current Moisture (Accent colored segment) */}
+                        <div 
+                          className="w-full rounded-t-sm transition-all"
+                          style={{ 
+                            height: `${(item.moisture / 240) * 100}%`,
+                            backgroundColor: item.color 
+                          }}
+                        />
+
+                      </div>
+
+                      <span className="text-[10px] mt-2 font-bold tracking-tight text-[var(--muted)] group-hover/bar:text-white transition-colors truncate max-w-full text-center">
+                        {item.name}
+                      </span>
+                    </div>
+                  ))
+                )}
               </div>
 
               {/* Chart Legend */}
-              <div className="flex gap-4 mt-6 text-[10px] text-[var(--muted)] px-2 font-semibold">
+              <div className="flex gap-4 mt-6 text-[10px] text-[var(--muted)] px-2 font-semibold select-none">
                 <div className="flex items-center gap-1.5">
                   <span className="w-2.5 h-2.5 rounded bg-[var(--accent)]" />
                   <span>Soil moisture</span>
@@ -378,26 +403,18 @@ export default function OverviewPage({ userName }: OverviewPageProps) {
             </div>
 
             {/* Right Area: Plant Status Table / Active Roster (2/5 width) */}
-            <div className="p-6 border border-[var(--border)] rounded-2xl bg-[var(--surface)] lg:col-span-2 flex flex-col justify-between relative overflow-hidden group transition-all hover:border-[var(--muted)]/30">
+            <div className="p-6 border border-[var(--muted)]/30 hover:border-[var(--muted)]/60 rounded-2xl bg-[var(--surface)] lg:col-span-2 flex flex-col justify-between relative overflow-hidden group transition-all">
               <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-emerald-500/60 to-transparent transition-opacity" />
               <div>
-                <div className="flex justify-between items-center mb-1">
-                  <h3 className="text-sm font-bold text-white">Active Plant Roster</h3>
+                <div className="flex justify-between items-center mb-1 select-none">
+                  <h3 className="text-sm font-semibold mb-3 text-[var(--muted)]">Plants that needs hydratation the most</h3>
                 </div>
-                <p className="text-[var(--muted)] text-xs mb-4">Garden schedule sorted by current hydration status.</p>
               </div>
 
-              <div className="flex-1 overflow-y-auto max-h-[290px] pr-1">
+              <div className="flex-1 overflow-y-auto max-h-[290px] pr-1 select-none">
                 {plants.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center py-16 text-center">
-                    <h4 className="text-xs font-bold text-white mb-1">No active care roster</h4>
-                    <p className="text-[var(--muted)] text-[10px] max-w-xs mb-4">Add your first plant to start building your care logs.</p>
-                    <Link
-                      href="/dashboard/add-plant"
-                      className="px-3 py-1.5 bg-[var(--accent)]/10 text-[var(--accent)] hover:bg-[var(--accent)] hover:text-white transition-all text-xs font-bold rounded-lg"
-                    >
-                      Browse Database
-                    </Link>
+                  <div className="flex flex-col items-center justify-center py-3 text-center">
+                    <p className="text-[var(--muted)] text-[10px] max-w-xs mb-4">No active plants</p>
                   </div>
                 ) : (
                   <div className="flex flex-col gap-2">
@@ -435,14 +452,12 @@ export default function OverviewPage({ userName }: OverviewPageProps) {
 
                           <div className="flex items-center gap-3">
                             <div className="text-right">
-                              <p className="text-[10px] font-bold text-white">
+                              <p className="text-[10px] font-semibold text-white">
                                 {formatNextWatering(item.nextWateringAt)}
                               </p>
                               <p className={`text-[9px] font-semibold ${status.textColor}`}>
-                                {status.text}
                               </p>
                             </div>
-                            <span className={`w-2.5 h-2.5 rounded-full shadow-sm ${status.color}`} />
                           </div>
                         </div>
                       )

@@ -1,7 +1,17 @@
 "use client"
 import { MethodBadge, CodeBlock } from "../components"
 
-const section = {
+interface Endpoint {
+    method: "POST" | "GET" | "PUT" | "DELETE"
+    path: string
+    description: string
+    body?: string
+    response: string
+    pathParams?: string
+    auth?: boolean
+}
+
+const section: { title: string; slug: string; endpoints: Endpoint[] } = {
     title: "Authentication",
     slug: "authentication",
     endpoints: [
@@ -48,7 +58,7 @@ export default function AuthenticationPage() {
     return (
         <div>
             <section className="scroll-mt-24">
-                <h2 className="text-3xl font-bold mb-8 pb-2 border-b border-[var(--border)]">
+                <h2 className="text-3xl  mb-8 pb-2 border-b border-[var(--border)]">
                     {section.title}
                 </h2>
                 <div className="space-y-24">

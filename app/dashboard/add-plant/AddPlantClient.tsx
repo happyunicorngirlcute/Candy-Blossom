@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
+import { motion, AnimatePresence } from "framer-motion"
 
 type Plant = {
   id: number
@@ -12,20 +13,13 @@ type Plant = {
   watering?: string
 }
 
-function PlantCard({ plant, API }: { plant: Plant, API: string }) {
+function AddPlantModal({ plant, API, onClose }: { plant: Plant, API: string, onClose: () => void }) {
   const [city, setCity] = useState("")
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const router = useRouter()
 
-  const isMissingInfo = !plant.sunlight || plant.sunlight.length === 0 || !plant.watering
-
   const handleAdd = async () => {
-    if (isMissingInfo) {
-      setError("This plant is missing vital care information (sunlight or watering) and cannot be added.")
-      return
-    }
-
     if (!city.trim()) {
       setError("City is required.")
       return
@@ -64,41 +58,88 @@ function PlantCard({ plant, API }: { plant: Plant, API: string }) {
   }
 
   return (
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/60 backdrop-blur-sm">
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        onClick={onClose}
+        className="absolute inset-0"
+      />
+      <motion.div
+        initial={{ opacity: 0, y: 40, scale: 0.97 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        exit={{ opacity: 0, y: 40, scale: 0.97 }}
+        transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+        className="bg-[var(--surface)] w-full sm:max-w-md rounded-t-2xl sm:rounded-3xl shadow-2xl border border-[var(--border)] relative overflow-hidden"
+      >
+        <button 
+          onClick={onClose}
+          className="absolute top-4 right-4 p-2 rounded-full bg-[var(--bg)] border border-[var(--border)] hover:bg-[var(--surface)] transition-colors z-10"
+        >
+          <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+
+        <div className="p-8">
+          <h2 className="text-2xl  mb-4 text-[var(--text)]">What city is the plant located?</h2>
+
+          <div className="space-y-4">
+            <div>
+              <input 
+                autoFocus
+                type="text" 
+                placeholder="e.g. Paris, London, New York..." 
+                value={city} 
+                onChange={(e) => setCity(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleAdd()}
+                className="w-full px-4 py-3 rounded-xl border border-[var(--border)] bg-[var(--bg)] text-[var(--text)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)] transition-all"
+              />
+            </div>
+
+            {error && (
+              <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg text-red-500 text-xs">
+                {error}
+              </div>
+            )}
+
+            <button
+              disabled={loading}
+              onClick={handleAdd}
+              className="w-full bg-[var(--accent)] cursor-pointer text-white px-4 py-4 rounded-xl font-bold hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center justify-center gap-2 h-10"
+            >
+              {loading ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  Adding...
+                </>
+              ) : "Confirm & Add"}
+            </button>
+          </div>
+        </div>
+      </motion.div>
+    </div>
+  )
+}
+
+function PlantCard({ plant, onAdd }: { plant: Plant, onAdd: (plant: Plant) => void }) {
+  const isMissingInfo = !plant.sunlight || plant.sunlight.length === 0 || !plant.watering
+
+  return (
     <div className="p-4 border border-[var(--border)] rounded-xl bg-[var(--surface)] flex flex-col h-full shadow-sm hover:shadow-md transition-shadow">
       {(plant.default_image?.regular_url || plant.default_image?.original_url) && (
         <img src={plant.default_image?.regular_url || plant.default_image?.original_url} alt={plant.common_name} className="w-full h-48 object-cover rounded-lg mb-4" />
       )}
       <div className="flex-1">
-        <h3 className="font-semibold text-lg">{plant.common_name}</h3>
-        
-        <div className="mt-2 space-y-1">
-          <div className="text-xs opacity-70 flex items-center gap-2">
-            <span className={`w-2 h-2 rounded-full ${!plant.sunlight || plant.sunlight.length === 0 ? "bg-red-500" : "bg-green-500"}`} />
-            <span className="font-medium">Sunlight:</span> {plant.sunlight && plant.sunlight.length > 0 ? plant.sunlight.join(", ") : "Missing"}
-          </div>
-          <div className="text-xs opacity-70 flex items-center gap-2">
-            <span className={`w-2 h-2 rounded-full ${!plant.watering ? "bg-red-500" : "bg-green-500"}`} />
-            <span className="font-medium">Watering:</span> {plant.watering || "Missing"}
-          </div>
-        </div>
-
-        {error && <p className="text-red-500 text-xs mt-3 bg-red-500/10 p-2 rounded border border-red-500/20">{error}</p>}
+        <h3 className=" text-[var(--muted)] text-lg">{plant.common_name}</h3>
       </div>
 
-      <div className="mt-4 pt-4 border-t border-[var(--border)]">
-        <input 
-          type="text" 
-          placeholder="Enter your city" 
-          value={city} 
-          onChange={(e) => setCity(e.target.value)}
-          className="w-full px-3 py-2 rounded-lg border border-[var(--border)] bg-[var(--bg)] text-sm mb-3 focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
-        />
+      <div className="pt-3 border-t border-[var(--border)]">
         <button
-          disabled={loading || isMissingInfo}
-          onClick={handleAdd}
+          disabled={isMissingInfo}
+          onClick={() => onAdd(plant)}
           className="w-full bg-[var(--accent)] text-white px-4 py-3 rounded-lg font-bold hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {loading ? "Adding..." : isMissingInfo ? "Incomplete Data" : "Add to My Plants"}
+          {isMissingInfo ? "Incomplete Data" : "Add to My Plants"}
         </button>
       </div>
     </div>
@@ -113,6 +154,7 @@ export default function AddPlantClient() {
   const [currentPage, setCurrentPage] = useState(1)
   const [lastPage, setLastPage] = useState(1)
   const [total, setTotal] = useState(0)
+  const [selectedPlantForAdd, setSelectedPlantForAdd] = useState<Plant | null>(null)
   const API = process.env.NEXT_PUBLIC_API_URL || ""
 
   const handleSearch = async (page: number = 1) => {
@@ -123,7 +165,6 @@ export default function AddPlantClient() {
     setCurrentPage(page)
 
     try {
-      // 1. Search for plants with pagination
       const searchRes = await fetch(`${API}/api/plants/search/${encodeURIComponent(searchTerm)}/${page}`)
       const searchData = await searchRes.json()
       if (!searchRes.ok) throw new Error(searchData.error || "Search failed")
@@ -131,21 +172,7 @@ export default function AddPlantClient() {
       const basicPlants = searchData.data || []
       setLastPage(searchData.last_page || 1)
       setTotal(searchData.total || 0)
-      
-      // 2. Fetch full details for each plant (Parallelized)
-      const detailedPlants = await Promise.all(
-        basicPlants.map(async (p: any) => {
-          try {
-            const detailRes = await fetch(`${API}/api/plants/details/${p.id}`)
-            const detailData = await detailRes.json()
-            return detailData.data
-          } catch (e) {
-            return p // Fallback to basic info
-          }
-        })
-      )
-
-      setResults(detailedPlants)
+      setResults(basicPlants)
     } catch (err: any) {
       setError(err.message || "Failed to search plants")
     } finally {
@@ -157,34 +184,33 @@ export default function AddPlantClient() {
     <div className="p-8 max-w-7xl mx-auto">
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-[var(--text)]">Discover New Plants</h1>
-          <p className="text-[var(--muted)] mt-1">Search the world's largest plant database and add them to your collection.</p>
+          <h1 className="text-3xl tracking-tight text-[var(--muted)]">Type the name of your plant</h1>
         </div>
       </div>
 
-      <div className="bg-[var(--surface)] p-6 rounded-2xl border border-[var(--border)] shadow-sm">
-        <div className="flex gap-4">
-          <div className="relative flex-1">
+      <div className="bg-[var(--surface)] p-8 rounded-2xl border border-[var(--border)] shadow-sm max-w-xl mx-auto">
+        <div className="space-y-6">
+          <div className="space-y-3 text-left">
             <input
               type="text"
-              placeholder="e.g. Monstera Deliciosa, Rose, Maple..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSearch(1)}
-              className="w-full pl-4 pr-10 py-3 rounded-xl border border-[var(--border)] bg-[var(--bg)] text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50 transition-all"
+              className="w-full px-3 py-2 rounded border border-[var(--border)] bg-[var(--surface)] text-sm text-[var(--text)] shadow-sm transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
             />
           </div>
+          
           <button 
             onClick={() => handleSearch(1)}
             disabled={searching}
-            className="px-8 py-3 bg-[var(--accent)] text-white rounded-xl font-semibold hover:opacity-90 transition-all disabled:opacity-50 flex items-center gap-2"
+            className="w-full select-none cursor-pointer inline-flex items-center justify-center px-4 py-3 rounded-md font-semibold transition-colors bg-[var(--text)] text-[var(--bg)] dark:bg-white dark:text-black hover:opacity-90 disabled:opacity-50"
           >
             {searching ? (
               <>
-                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                <div className="w-4 h-4 border-2 border-[var(--bg)] border-t-transparent rounded-full animate-spin mr-2" />
                 Searching...
               </>
-            ) : "Search"}
+            ) : "Let's search for it"}
           </button>
         </div>
         {error && <div className="mt-4 p-4 bg-red-500/10 text-red-600 rounded-xl border border-red-500/20 text-sm">{error}</div>}
@@ -215,7 +241,7 @@ export default function AddPlantClient() {
 
       <div className="mt-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {results.map((plant) => (
-          <PlantCard key={plant.id} plant={plant} API={API} />
+          <PlantCard key={plant.id} plant={plant} onAdd={(p) => setSelectedPlantForAdd(p)} />
         ))}
         {!searching && results.length === 0 && searchTerm && (
           <div className="col-span-full py-20 text-center">
@@ -245,6 +271,16 @@ export default function AddPlantClient() {
           </button>
         </div>
       )}
+
+      <AnimatePresence>
+        {selectedPlantForAdd && (
+          <AddPlantModal 
+            plant={selectedPlantForAdd} 
+            API={API} 
+            onClose={() => setSelectedPlantForAdd(null)} 
+          />
+        )}
+      </AnimatePresence>
     </div>
   )
 }

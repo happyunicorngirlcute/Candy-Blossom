@@ -3,7 +3,28 @@
 import { useEffect, useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
+import { motion, AnimatePresence } from "framer-motion"
 import PlantDetailsModal from "@/components/PlantDetailsModal"
+
+const PlantLeafIcon = () => (
+  <svg className="w-10 h-10 text-[var(--accent)] opacity-50" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8a13 13 0 0 1-13 13L11 20z" />
+    <path d="M9 13c1.9 2.8 4.3 3.9 6.2 4.5" />
+  </svg>
+)
+
+const cardVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: {
+      delay: i * 0.08,
+      duration: 0.45,
+      ease: [0.22, 1, 0.36, 1],
+    },
+  }),
+}
 
 export default function MyPlantsPage() {
   const [plants, setPlants] = useState<any[]>([])
@@ -83,14 +104,21 @@ export default function MyPlantsPage() {
   if (error) return <div className="p-8 text-red-500">Error: {error}</div>
 
   return (
-    <div className="p-8">
-      <h1 className="text-2xl font-bold">My Plants</h1>
+    <div className="p-4 sm:p-6 md:p-8">
+      <motion.h1
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+        className="text-2xl "
+      >
+        My Plants
+      </motion.h1>
 
-      <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
         {plants.length === 0 ? (
           <p>No plants added yet. Add one now!</p>
         ) : (
-          plants.map((item: any) => {
+          plants.map((item: any, index: number) => {
             // Depending on how API Platform serializes the nested object:
             // Sometimes it's item.plant, sometimes it's just the object if groups were merged.
             const p = item.plant
@@ -126,14 +154,21 @@ export default function MyPlantsPage() {
             }
 
             return (
-              <div key={item.id} className="group relative overflow-hidden p-0 border border-[var(--border)] rounded-2xl bg-[var(--surface)] flex flex-col shadow-sm hover:shadow-md transition-all">
+              <motion.div
+                key={item.id}
+                custom={index}
+                initial="hidden"
+                animate="visible"
+       
+                className="group select-none relative overflow-hidden p-0 border border-[var(--border)] rounded-2xl bg-[var(--surface)] flex flex-col shadow-sm hover:shadow-lg transition-shadow"
+              >
                 {/* Image Section */}
                 <div className="relative h-48 w-full overflow-hidden bg-[var(--bg)]">
                   {displayImage ? (
-                    <img src={displayImage} alt={p.common_name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                    <img src={displayImage} alt={p.common_name} className="w-full h-full object-cover" />
                   ) : (
                     <div className="w-full h-full flex flex-col items-center justify-center gap-3">
-                      <div className="text-4xl opacity-50">🌱</div>
+                      <PlantLeafIcon />
                       <label className="cursor-pointer bg-[var(--accent)]/10 text-[var(--accent)] px-4 py-1.5 rounded-full text-xs font-bold hover:bg-[var(--accent)] hover:text-white transition-all">
                         <span>Add Photo</span>
                         <input 
@@ -154,7 +189,7 @@ export default function MyPlantsPage() {
 
                 {/* Content Section */}
                 <div className="p-5 flex-1 flex flex-col">
-                  <h3 className="font-bold text-xl mb-1 text-[var(--text)]">{p?.common_name || "Unknown plant"}</h3>
+                  <h3 className=" text-xl mb-1 text-[var(--text)]">{p?.common_name || "Unknown plant"}</h3>
                   
                   <div className="mt-4 space-y-3">
                     <div className="flex items-center gap-3">
@@ -162,7 +197,7 @@ export default function MyPlantsPage() {
                         <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
                       </div>
                       <div>
-                        <p className="text-[10px] uppercase font-bold opacity-40 leading-none mb-1">Sunlight</p>
+                        <p className="text-[10px] uppercase  opacity-40 leading-none mb-1">Sunlight</p>
                         <p className="text-sm font-medium">{Array.isArray(p?.sunlight) ? p.sunlight.join(', ') : p?.sunlight || 'N/A'}</p>
                       </div>
                     </div>
@@ -172,7 +207,7 @@ export default function MyPlantsPage() {
                         <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>
                       </div>
                       <div>
-                        <p className="text-[10px] uppercase font-bold opacity-40 leading-none mb-1">Watering</p>
+                        <p className="text-[10px] uppercase opacity-40 leading-none mb-1">Watering</p>
                         <p className="text-sm font-medium">{p?.watering || 'N/A'}</p>
                       </div>
                     </div>
@@ -180,7 +215,6 @@ export default function MyPlantsPage() {
 
                   <div className="mt-6 pt-5 border-t border-[var(--border)] flex flex-col gap-4">
                     <div className="flex items-center justify-between">
-                      <p className="text-xs font-semibold opacity-60">Next Care</p>
                       <p className={`text-xs font-bold px-2 py-1 rounded-md ${wateringDate && wateringDate < new Date() ? 'bg-red-500/10 text-red-500' : 'bg-[var(--accent)]/10 text-[var(--accent)]'}`}>
                         {wateringDate ? wateringDate.toLocaleDateString() : "Not scheduled"}
                       </p>
@@ -189,7 +223,7 @@ export default function MyPlantsPage() {
                     <div className="flex flex-col gap-2">
                       <button
                         onClick={() => setSelectedPlant(p)}
-                        className="w-full py-2.5 rounded-xl bg-[var(--accent)]/10 text-[var(--accent)] text-sm font-bold hover:bg-[var(--accent)] hover:text-white transition-all flex items-center justify-center gap-2"
+                        className="w-full py-2.5 rounded-xl cursor-pointer bg-[var(--accent)]/10 text-[var(--accent)] text-sm font-bold hover:bg-[var(--accent)] hover:text-white transition-all flex items-center justify-center gap-2"
                       >
                         <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                         View Details
@@ -197,7 +231,7 @@ export default function MyPlantsPage() {
 
                       <button
                         onClick={() => handleDelete(item.id)}
-                        className="w-full py-2.5 rounded-xl border border-red-500/20 text-red-500 text-sm font-bold hover:bg-red-500 hover:text-white transition-all flex items-center justify-center gap-2 group/del"
+                        className="w-full py-2.5 rounded-xl border cursor-pointer border-red-500/20 text-red-500 text-sm font-bold hover:bg-red-500 hover:text-white transition-all flex items-center justify-center gap-2 group/del"
                       >
                         <svg className="w-4 h-4 group-hover/del:scale-110 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M10 11v6M14 11v6"/></svg>
                         Remove Plant
@@ -205,18 +239,20 @@ export default function MyPlantsPage() {
                     </div>
                   </div>
                 </div>
-              </div>
+              </motion.div>
             )
           })
         )}
       </div>
 
-      {selectedPlant && (
-        <PlantDetailsModal 
-          plant={selectedPlant} 
-          onClose={() => setSelectedPlant(null)} 
-        />
-      )}
+      <AnimatePresence>
+        {selectedPlant && (
+          <PlantDetailsModal 
+            plant={selectedPlant} 
+            onClose={() => setSelectedPlant(null)} 
+          />
+        )}
+      </AnimatePresence>
     </div>
   )
 }

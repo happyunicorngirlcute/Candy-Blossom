@@ -3,7 +3,7 @@
 import { MethodBadge, CodeBlock } from "../components"
 
 const section = {
-    title: "User Collection",
+    title: "Collection of a user",
     slug: "user-collection",
     endpoints: [
         {
@@ -47,7 +47,7 @@ export default function UserCollectionPage() {
     return (
         <div>
             <section className="scroll-mt-24">
-                <h2 className="text-3xl font-bold mb-8 pb-2 border-b border-[var(--border)]">
+                <h2 className="text-3xl  mb-8 pb-2 border-b border-[var(--border)]">
                     {section.title}
                 </h2>
                 <div className="space-y-24">

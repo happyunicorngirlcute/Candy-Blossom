@@ -4,7 +4,7 @@
 import { MethodBadge, CodeBlock } from "../components"
 
 const section = {
-    title: "Plants",
+    title: "The Plants",
     slug: "plants",
     endpoints: [
         {
@@ -63,7 +63,7 @@ export default function PlantsPage() {
     return (
         <div>
             <section className="scroll-mt-24">
-                <h2 className="text-3xl font-bold mb-8 pb-2 border-b border-[var(--border)]">
+                <h2 className="text-3xl  mb-8 pb-2 border-b border-[var(--border)]">
                     {section.title}
                 </h2>
                 <div className="space-y-24">
