@@ -256,8 +256,8 @@ export default function OverviewPage({ userName }: OverviewPageProps) {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold tracking-tight text-[var(--text)]">
-              {displayName} is back. Welcome to my home
+            <h1 className="text-2xl  tracking-tight text-[var(--text)]">
+              {displayName} emerges.
             </h1>
           </div>
         </div>

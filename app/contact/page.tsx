@@ -69,7 +69,7 @@ export default function ContactPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--bg)] text-[var(--text)] flex items-center justify-center px-4 py-12 sm:py-20">
+    <div className="min-h-screen bg-[var(--bg)] text-[var(--text)] select-none flex items-center justify-center px-4 py-12 sm:py-20">
       <div className="w-full max-w-5xl">
         <motion.div
           initial="hidden"
@@ -141,19 +141,9 @@ export default function ContactPage() {
                   transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
                   className="flex flex-col items-center justify-center text-center h-full min-h-[400px] gap-6"
                 >
-                  <CheckCircleIcon />
                   <div>
-                    <h2 className="text-2xl font-bold mb-2">Message sent</h2>
-                    <p className="text-[var(--muted)] text-sm max-w-xs mx-auto leading-relaxed">
-                      Thank you for reaching out. We will get back to you shortly.
-                    </p>
+                    <h2 className="text-2xl text-[var(--muted)] mb-2">Your message has been sent, I'll check it soon!</h2>
                   </div>
-                  <button
-                    onClick={() => setSubmitted(false)}
-                    className="mt-4 text-sm text-[var(--accent)] font-semibold hover:underline underline-offset-4 transition-all"
-                  >
-                    Send another message
-                  </button>
                 </motion.div>
               ) : (
                 <motion.form
