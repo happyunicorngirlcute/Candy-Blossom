@@ -78,7 +78,7 @@ export default function Login() {
             <section className="min-h-screen flex items-center justify-center px-6">
                 <div className="max-w-4xl text-center space-y-6">
 
-                    <motion.h1 variants={itemVariants} className="text-4xl font-thin leading-tight">
+                    <motion.h1 variants={itemVariants} className="text-2xl sm:text-3xl md:text-4xl font-thin leading-tight">
                         Log in to Candy Blossom
                     </motion.h1>
 

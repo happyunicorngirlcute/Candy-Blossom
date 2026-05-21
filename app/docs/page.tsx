@@ -17,7 +17,7 @@ console.log(data);`
     return (
         <div>
             <header className="mb-16">
-                <p className="text-xl opacity-60 max-w-3xl leading-relaxed">
+                <p className="text-base sm:text-xl opacity-60 max-w-3xl leading-relaxed">
                     Welcome to Candy Blossom's API. Our API is designed around REST,
                     returning JSON-encoded responses and using standard HTTP response codes
                 </p>

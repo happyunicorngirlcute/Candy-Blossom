@@ -95,14 +95,14 @@ export default function AuthRegister() {
 
                     {!sent ? (
                         <>
-                            <motion.h1 variants={itemVariants} className="text-3xl font-thin leading-tight">
+                            <motion.h1 variants={itemVariants} className="text-2xl sm:text-3xl font-thin leading-tight">
                                 {step === 0 && 'What should I call you?'}
                                 {step === 1 && (name ? `What's your email address, ${name
                                     }?` : 'What\'s your email address?')}
                             </motion.h1>
 
                             <div className="w-full">
-                                <div className="w-[390px] mx-auto">
+                                <div className="w-full max-w-[390px] mx-auto px-4">
                                     {step === 0 && (
                                         <motion.div variants={itemVariants} className="text-center">
                                             <input
@@ -165,7 +165,7 @@ export default function AuthRegister() {
                         </>
                     ) : (
 
-                        <h1 className="text-4xl font-thin leading-tight"> {name}. That's a cool name! Check your inbox</h1>
+                        <h1 className="text-2xl sm:text-3xl md:text-4xl font-thin leading-tight px-4"> {name}. That's a cool name! Check your inbox</h1>
 
                     )}
 

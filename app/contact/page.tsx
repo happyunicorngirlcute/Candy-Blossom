@@ -8,7 +8,7 @@ const fadeUp = {
   visible: (i: number) => ({
     opacity: 1,
     y: 0,
-    transition: { delay: i * 0.1, duration: 0.5, ease: [0.22, 1, 0.36, 1] },
+    transition: { delay: i * 0.1, duration: 0.5, ease: [0.22, 1, 0.36, 1] as const },
   }),
 }
 
@@ -80,7 +80,7 @@ export default function ContactPage() {
           <motion.div
             custom={0}
             variants={fadeUp}
-            className="lg:col-span-2 p-8 sm:p-10 flex flex-col justify-between bg-[var(--bg)] border-b lg:border-b-0 lg:border-r border-[var(--border)]"
+            className="lg:col-span-2 p-6 sm:p-8 md:p-10 flex flex-col justify-between bg-[var(--bg)] border-b lg:border-b-0 lg:border-r border-[var(--border)]"
           >
             <div>
               <motion.h1
@@ -130,7 +130,7 @@ export default function ContactPage() {
           </motion.div>
 
           {/* Right – Form */}
-          <motion.div custom={1} variants={fadeUp} className="lg:col-span-3 p-8 sm:p-10">
+          <motion.div custom={1} variants={fadeUp} className="lg:col-span-3 p-6 sm:p-8 md:p-10">
             <AnimatePresence mode="wait">
               {submitted ? (
                 <motion.div

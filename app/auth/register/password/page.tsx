@@ -81,7 +81,7 @@ function RegisterPasswordContent() {
             className="min-h-screen bg-[var(--bg)] text-[var(--text)] transition-colors flex items-center justify-center"
         >
             <section className="max-w-md w-full text-center space-y-6 px-6">
-                <motion.h1 variants={itemVariants} className="text-3xl  leading-tight font-semibold">
+                <motion.h1 variants={itemVariants} className="text-2xl sm:text-3xl leading-tight font-semibold">
                     Your Password?
                 </motion.h1>
 

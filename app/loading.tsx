@@ -1,6 +1,6 @@
 export default function Loading() {
     return (
-        <main className="min-h-screen bg-[var(--bg)] transition-colors p-6 flex items-center justify-center">
+        <main className="min-h-screen bg-[var(--bg)] transition-colors p-4 sm:p-6 flex items-center justify-center">
             <div className="max-w-4xl w-full space-y-8 animate-pulse">
                 {/* Header Skeleton */}
                 <div className="flex flex-col items-center space-y-4">

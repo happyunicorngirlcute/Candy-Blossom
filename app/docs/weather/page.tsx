@@ -2,7 +2,16 @@
 
 import { MethodBadge, CodeBlock } from "../components"
 
-const section = {
+interface Endpoint {
+    method: "POST" | "GET" | "PUT" | "DELETE"
+    path: string
+    description: string
+    body?: string
+    response: string
+    auth?: boolean
+}
+
+const section: { title: string; slug: string; endpoints: Endpoint[] } = {
     title: "Weather Information",
     slug: "weather",
     endpoints: [

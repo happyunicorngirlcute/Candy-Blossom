@@ -64,7 +64,7 @@ function VerifyEmailContent() {
             animate="visible"
             className="min-h-screen bg-[var(--bg)] text-[var(--text)] transition-colors flex items-center justify-center"
         >
-            <motion.h1 variants={itemVariants} className="text-4xl font-thin leading-tight text-center">
+            <motion.h1 variants={itemVariants} className="text-2xl sm:text-3xl md:text-4xl font-thin leading-tight text-center">
                 Verifying... {status === 'success' && "Success!"}
                 {status === 'error' && "Give it a moment?"}
             </motion.h1>

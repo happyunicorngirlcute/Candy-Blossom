@@ -1,17 +1,9 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
 import PlantDetailsModal from "@/components/PlantDetailsModal"
-
-const PlantLeafIcon = () => (
-  <svg className="w-10 h-10 text-[var(--accent)] opacity-50" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8a13 13 0 0 1-13 13L11 20z" />
-    <path d="M9 13c1.9 2.8 4.3 3.9 6.2 4.5" />
-  </svg>
-)
 
 const cardVariants = {
   hidden: { opacity: 0, y: 20 },
@@ -163,24 +155,29 @@ export default function MyPlantsPage() {
                 className="group select-none relative overflow-hidden p-0 border border-[var(--border)] rounded-2xl bg-[var(--surface)] flex flex-col shadow-sm hover:shadow-lg transition-shadow"
               >
                 {/* Image Section */}
-                <div className="relative h-48 w-full overflow-hidden bg-[var(--bg)]">
+                <div className="relative h-48 w-full overflow-hidden bg-[var(--bg)] group/image">
                   {displayImage ? (
                     <img src={displayImage} alt={p.common_name} className="w-full h-full object-cover" />
                   ) : (
-                    <div className="w-full h-full flex flex-col items-center justify-center gap-3">
-                      <PlantLeafIcon />
-                      <label className="cursor-pointer bg-[var(--accent)]/10 text-[var(--accent)] px-4 py-1.5 rounded-full text-xs font-bold hover:bg-[var(--accent)] hover:text-white transition-all">
-                        <span>Add Photo</span>
-                        <input 
-                          type="file" 
-                          accept="image/*" 
-                          className="hidden" 
-                          onChange={handleImageUpload}
-                        />
-                      </label>
-                    </div>
+                    <img 
+                      src="/favicon.ico" 
+                      alt={p.common_name} 
+                      className="w-full h-full object-contain p-10 opacity-20"
+                    />
                   )}
-                  <div className="absolute top-3 right-3 flex gap-2">
+                  <div className="absolute inset-0 bg-black/0 group-hover/image:bg-black/30 transition-all flex items-center justify-center">
+                    <label className="cursor-pointer opacity-0 group-hover/image:opacity-100 transition-all bg-white/10 backdrop-blur-md text-white px-4 py-2 rounded-xl text-xs font-semibold border border-white/20 hover:bg-white/20">
+                      <svg className="w-4 h-4 inline-block mr-1.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                      {displayImage ? "Change Photo" : "Add Photo"}
+                      <input 
+                        type="file" 
+                        accept="image/*" 
+                        className="hidden" 
+                        onChange={handleImageUpload}
+                      />
+                    </label>
+                  </div>
+                  <div className="absolute top-3 right-3 flex gap-2 z-10">
                     <span className="bg-black/50 backdrop-blur-md text-white px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider">
                       {item.city}
                     </span>

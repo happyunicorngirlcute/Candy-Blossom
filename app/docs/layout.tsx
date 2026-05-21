@@ -50,7 +50,7 @@ export default function DocsLayout({
             </aside>
 
             {/* Main Content */}
-            <main className="flex-1 md:ml-64 p-8 md:p-16 max-w-5xl">
+            <main className="flex-1 md:ml-64 p-4 sm:p-6 md:p-16 max-w-5xl">
                 {children}
             </main>
         </div>

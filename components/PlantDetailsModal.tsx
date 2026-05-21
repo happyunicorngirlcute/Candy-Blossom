@@ -8,13 +8,6 @@ interface PlantDetailsModalProps {
   onClose: () => void
 }
 
-const LeafIcon = () => (
-  <svg className="w-16 h-16 text-[var(--accent)] opacity-40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8a13 13 0 0 1-13 13L11 20z" />
-    <path d="M9 13c1.9 2.8 4.3 3.9 6.2 4.5" />
-  </svg>
-)
-
 const PlantDetailsModal: React.FC<PlantDetailsModalProps> = ({ plant, onClose }) => {
   if (!plant) return null
 
@@ -66,9 +59,11 @@ const PlantDetailsModal: React.FC<PlantDetailsModalProps> = ({ plant, onClose })
           {plant.image ? (
             <img src={plant.image} alt={plant.common_name} className="w-full h-full object-cover" />
           ) : (
-            <div className="w-full h-full bg-[var(--bg)] flex items-center justify-center">
-              <LeafIcon />
-            </div>
+            <img 
+              src="/favicon.ico" 
+              alt={plant.common_name} 
+              className="w-full h-full object-contain p-16 opacity-20 bg-[var(--bg)]"
+            />
           )}
           <div className="absolute inset-0 bg-gradient-to-t from-[var(--surface)] to-transparent" />
           <div className="absolute bottom-4 left-5 sm:bottom-6 sm:left-8 right-14">

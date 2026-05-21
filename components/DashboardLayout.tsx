@@ -43,7 +43,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const { isAuthenticated, loading } = useAuth()
   const pathname = usePathname()
   const router = useRouter()
-  const [notification, setNotification] = useState<{ plantName: string } | null>(null)
+  const [notification, setNotification] = useState<{ type?: string; plantName: string; message?: string } | null>(null)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   
   const API = process.env.NEXT_PUBLIC_API_URL

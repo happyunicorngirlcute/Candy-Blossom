@@ -1,8 +1,12 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, Suspense } from "react"
 import { useRouter } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
+import dynamic from "next/dynamic"
+import { useTheme } from "@/components/ThemeProvider"
+
+const PlantScene = dynamic(() => import("@/components/scenes/PlantScene"), { ssr: false })
 
 type Plant = {
   id: number
@@ -11,6 +15,11 @@ type Plant = {
   default_image?: { original_url?: string; regular_url?: string; thumbnail?: string }
   sunlight?: string[]
   watering?: string
+}
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 16 },
+  visible: { opacity: 1, y: 0 },
 }
 
 function AddPlantModal({ plant, API, onClose }: { plant: Plant, API: string, onClose: () => void }) {
@@ -80,8 +89,24 @@ function AddPlantModal({ plant, API, onClose }: { plant: Plant, API: string, onC
           <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
         </button>
 
-        <div className="p-8">
-          <h2 className="text-2xl  mb-4 text-[var(--text)]">What city is the plant located?</h2>
+        {plant.default_image?.regular_url && (
+          <div className="relative h-40 sm:h-48 w-full overflow-hidden">
+            <img 
+              src={plant.default_image.regular_url} 
+              alt={plant.common_name} 
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-[var(--surface)] via-[var(--surface)]/60 to-transparent" />
+            <div className="absolute bottom-4 left-8">
+              <h2 className="text-xl font-semibold text-[var(--text)]">{plant.common_name}</h2>
+            </div>
+          </div>
+        )}
+
+        <div className="p-6 sm:p-8">
+          {!plant.default_image?.regular_url && (
+            <h2 className="text-xl font-semibold mb-6 text-[var(--text)]">What city is the plant located?</h2>
+          )}
 
           <div className="space-y-4">
             <div>
@@ -92,27 +117,31 @@ function AddPlantModal({ plant, API, onClose }: { plant: Plant, API: string, onC
                 value={city} 
                 onChange={(e) => setCity(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleAdd()}
-                className="w-full px-4 py-3 rounded-xl border border-[var(--border)] bg-[var(--bg)] text-[var(--text)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)] transition-all"
+                className="w-full px-4 py-3.5 rounded-xl border border-[var(--border)] bg-[var(--bg)] text-[var(--text)] text-sm placeholder:text-[var(--muted)]/50 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/30 focus:border-[var(--accent)]/50 transition-all"
               />
             </div>
 
             {error && (
-              <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg text-red-500 text-xs">
+              <motion.div 
+                initial={{ opacity: 0, y: -8 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="p-3 bg-red-500/10 border border-red-500/20 rounded-xl text-red-500 text-xs leading-relaxed"
+              >
                 {error}
-              </div>
+              </motion.div>
             )}
 
             <button
               disabled={loading}
               onClick={handleAdd}
-              className="w-full bg-[var(--accent)] cursor-pointer text-white px-4 py-4 rounded-xl font-bold hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center justify-center gap-2 h-10"
+              className="w-full bg-[var(--accent)] cursor-pointer text-white px-6 py-3.5 rounded-xl font-semibold text-sm hover:brightness-110 active:brightness-95 transition-all disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
               {loading ? (
                 <>
                   <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  Adding...
+                  Adding to collection...
                 </>
-              ) : "Confirm & Add"}
+              ) : "Confirm & Add to Collection"}
             </button>
           </div>
         </div>
@@ -121,32 +150,87 @@ function AddPlantModal({ plant, API, onClose }: { plant: Plant, API: string, onC
   )
 }
 
-function PlantCard({ plant, onAdd }: { plant: Plant, onAdd: (plant: Plant) => void }) {
+function PlantCard({ plant, onAdd, index }: { plant: Plant, onAdd: (plant: Plant) => void, index: number }) {
   const isMissingInfo = !plant.sunlight || plant.sunlight.length === 0 || !plant.watering
+  const imageUrl = plant.default_image?.regular_url || plant.default_image?.original_url
 
   return (
-    <div className="p-4 border border-[var(--border)] rounded-xl bg-[var(--surface)] flex flex-col h-full shadow-sm hover:shadow-md transition-shadow">
-      {(plant.default_image?.regular_url || plant.default_image?.original_url) && (
-        <img src={plant.default_image?.regular_url || plant.default_image?.original_url} alt={plant.common_name} className="w-full h-48 object-cover rounded-lg mb-4" />
-      )}
-      <div className="flex-1">
-        <h3 className=" text-[var(--muted)] text-lg">{plant.common_name}</h3>
+    <motion.div
+      variants={itemVariants}
+      initial="hidden"
+      animate="visible"
+      transition={{ delay: index * 0.04, duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+      className="group relative flex flex-col overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--surface)] transition-all duration-300 hover:shadow-lg hover:border-[var(--muted)]/30"
+    >
+      <div className="relative h-52 w-full overflow-hidden bg-[var(--bg)]">
+        {imageUrl ? (
+          <img 
+            src={imageUrl} 
+            alt={plant.common_name} 
+            className="w-full h-full object-cover transition-all duration-500 group-hover:scale-105"
+          />
+        ) : (
+          <img 
+            src="/favicon.ico" 
+            alt={plant.common_name} 
+            className="w-full h-full object-contain p-8 opacity-30"
+          />
+        )}
+        <div className="absolute inset-0 bg-gradient-to-t from-[var(--surface)] via-transparent to-transparent opacity-60" />
+        <div className="absolute top-3 right-3 flex gap-2">
+          {isMissingInfo && (
+            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-500/15 backdrop-blur-md text-amber-500 text-[10px] font-semibold uppercase tracking-wider border border-amber-500/20">
+              <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              Incomplete
+            </span>
+          )}
+        </div>
       </div>
 
-      <div className="pt-3 border-t border-[var(--border)]">
-        <button
-          disabled={isMissingInfo}
-          onClick={() => onAdd(plant)}
-          className="w-full bg-[var(--accent)] text-white px-4 py-3 rounded-lg font-bold hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {isMissingInfo ? "Incomplete Data" : "Add to My Plants"}
-        </button>
+      <div className="flex flex-col flex-1 p-5 select-none">
+        <h3 className="text-base font-semibold text-[var(--text)] leading-snug">{plant.common_name}</h3>
+        
+        <div className="mt-3 flex flex-wrap gap-2">
+          {plant.sunlight && plant.sunlight.length > 0 && (
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-500/10 text-amber-500 text-[10px] font-semibold">
+              <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+              {plant.sunlight[0]}
+            </span>
+          )}
+          {plant.watering && (
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-blue-500/10 text-blue-500 text-[10px] font-semibold">
+              <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>
+              {plant.watering}
+            </span>
+          )}  
+        </div>
+
+        <div className="mt-auto pt-4">
+          <button
+            disabled={isMissingInfo}
+            onClick={() => onAdd(plant)}
+            className="w-full cursor-pointer py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 flex items-center justify-center gap-2 bg-[var(--accent)]/10 text-[var(--accent)] hover:bg-[var(--accent)] hover:text-white active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-[var(--accent)]/10 disabled:hover:text-[var(--accent)] disabled:active:scale-100"
+          >
+            {isMissingInfo ? (
+              <>
+                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                Incomplete Data
+              </>
+            ) : (
+              <>
+                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Add to Collection
+              </>
+            )}
+          </button>
+        </div>
       </div>
-    </div>
+    </motion.div>
   )
 }
 
 export default function AddPlantClient() {
+  const { dark } = useTheme()
   const [searchTerm, setSearchTerm] = useState("")
   const [results, setResults] = useState<Plant[]>([])
   const [error, setError] = useState<string | null>(null)
@@ -181,95 +265,208 @@ export default function AddPlantClient() {
   }
 
   return (
-    <div className="p-8 max-w-7xl mx-auto">
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-3xl tracking-tight text-[var(--muted)]">Type the name of your plant</h1>
-        </div>
+    <div className="p-4 sm:p-6 md:p-8 max-w-7xl mx-auto">
+      <div className="flex flex-col lg:flex-row items-center gap-8 lg:gap-16 mb-8 md:mb-12">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+          className="flex-1"
+        >
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-semibold tracking-tight text-[var(--text)] leading-[1.15]">
+            Search for your plant.
+            <br />
+            <span className="text-[var(--accent)]">I&apos;ll tell you how to take care of it.</span>
+          </h1>
+          <p className="mt-3 text-sm text-[var(--muted)]/70 max-w-md">
+            Find any plant species from our database and add it to your collection to start tracking its care.
+          </p>
+        </motion.div>
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.6, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
+          className="w-48 h-48 md:w-56 md:h-56 shrink-0"
+        >
+          <Suspense fallback={<div className="w-full h-full" />}>
+            <PlantScene dark={!!dark} />
+          </Suspense>
+        </motion.div>
       </div>
 
-      <div className="bg-[var(--surface)] p-8 rounded-2xl border border-[var(--border)] shadow-sm max-w-xl mx-auto">
-        <div className="space-y-6">
-          <div className="space-y-3 text-left">
-            <input
-              type="text"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleSearch(1)}
-              className="w-full px-3 py-2 rounded border border-[var(--border)] bg-[var(--surface)] text-sm text-[var(--text)] shadow-sm transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
-            />
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
+        className="relative"
+      >
+        <div className="bg-[var(--surface)] rounded-2xl border border-[var(--border)] shadow-sm max-w-2xl mx-auto overflow-hidden">
+          <div className="p-6 sm:p-10">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
+              <div className="relative flex-1">
+                <svg 
+                  className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--muted)]/40 pointer-events-none" 
+                  viewBox="0 0 24 24" 
+                  fill="none" 
+                  stroke="currentColor" 
+                  strokeWidth="2" 
+                  strokeLinecap="round" 
+                  strokeLinejoin="round"
+                >
+                  <circle cx="11" cy="11" r="8" />
+                  <path d="M21 21l-4.35-4.35" />
+                </svg>
+                <input
+                  type="text"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleSearch(1)}
+                  className="w-full pl-11 pr-4 py-3.5 rounded-xl border border-[var(--border)] bg-[var(--bg)] text-[var(--text)] text-sm placeholder:text-[var(--muted)]/40 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/20 focus:border-[var(--accent)]/40 transition-all"
+                />
+              </div>
+              <button 
+                onClick={() => handleSearch(1)}
+                disabled={searching}
+                className="shrink-0 cursor-pointer px-6 py-3.5 rounded-xl font-semibold text-sm transition-all duration-200 bg-[var(--accent)] text-white hover:brightness-110 active:brightness-95 active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              >
+                {searching ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    Searching
+                  </>
+                ) : (
+                  <>
+                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+                    Search
+                  </>
+                )}
+              </button>
+            </div>
+
+            {error && (
+              <motion.div 
+                initial={{ opacity: 0, y: -8 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mt-4 p-4 bg-red-500/10 text-red-500 rounded-xl border border-red-500/20 text-sm leading-relaxed"
+              >
+                {error}
+              </motion.div>
+            )}
           </div>
-          
-          <button 
-            onClick={() => handleSearch(1)}
-            disabled={searching}
-            className="w-full select-none cursor-pointer inline-flex items-center justify-center px-4 py-3 rounded-md font-semibold transition-colors bg-[var(--text)] text-[var(--bg)] dark:bg-white dark:text-black hover:opacity-90 disabled:opacity-50"
-          >
-            {searching ? (
-              <>
-                <div className="w-4 h-4 border-2 border-[var(--bg)] border-t-transparent rounded-full animate-spin mr-2" />
-                Searching...
-              </>
-            ) : "Let's search for it"}
-          </button>
         </div>
-        {error && <div className="mt-4 p-4 bg-red-500/10 text-red-600 rounded-xl border border-red-500/20 text-sm">{error}</div>}
-      </div>
+      </motion.div>
 
-      {total > 0 && (
-        <div className="mt-6 flex items-center justify-between px-2">
-          <p className="text-sm opacity-50">Found {total} results</p>
-          <div className="flex items-center gap-4">
+      {total > 0 && !searching && (
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="mt-6 flex items-center justify-between px-1"
+        >
+          <p className="text-xs text-[var(--muted)]/60 font-medium">
+            <span className="text-[var(--muted)]/80 font-semibold">{total}</span> results found
+          </p>
+          <div className="flex items-center gap-3">
             <button 
-              disabled={currentPage <= 1 || searching}
+              disabled={currentPage <= 1}
               onClick={() => handleSearch(currentPage - 1)}
-              className="p-2 rounded-lg border border-[var(--border)] hover:bg-[var(--surface)] disabled:opacity-30"
+              className="p-2 rounded-lg border border-[var(--border)] hover:bg-[var(--border)] disabled:opacity-30 disabled:cursor-not-allowed transition-all text-[var(--muted)] hover:text-[var(--text)]"
             >
-              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M15 18l-6-6 6-6"/></svg>
+              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M15 18l-6-6 6-6"/></svg>
             </button>
-            <span className="text-sm font-bold">Page {currentPage} of {lastPage}</span>
+            <span className="text-xs font-semibold text-[var(--muted)]/70 tabular-nums">{currentPage} / {lastPage}</span>
             <button 
-              disabled={currentPage >= lastPage || searching}
+              disabled={currentPage >= lastPage}
               onClick={() => handleSearch(currentPage + 1)}
-              className="p-2 rounded-lg border border-[var(--border)] hover:bg-[var(--surface)] disabled:opacity-30"
+              className="p-2 rounded-lg border border-[var(--border)] hover:bg-[var(--border)] disabled:opacity-30 disabled:cursor-not-allowed transition-all text-[var(--muted)] hover:text-[var(--text)]"
             >
-              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 18l6-6-6-6"/></svg>
+              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 18l6-6-6-6"/></svg>
             </button>
           </div>
-        </div>
+        </motion.div>
       )}
 
-      <div className="mt-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {results.map((plant) => (
-          <PlantCard key={plant.id} plant={plant} onAdd={(p) => setSelectedPlantForAdd(p)} />
+      <div className="mt-6 md:mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-5">
+        {results.map((plant, i) => (
+          <PlantCard key={plant.id} plant={plant} index={i} onAdd={(p) => setSelectedPlantForAdd(p)} />
         ))}
         {!searching && results.length === 0 && searchTerm && (
-          <div className="col-span-full py-20 text-center">
-            <div className="text-4xl mb-4">🌱</div>
-            <h3 className="text-xl font-medium opacity-50">No plants found matching "{searchTerm}"</h3>
-            <p className="opacity-40">Try searching for a different name or species.</p>
-          </div>
+          <motion.div 
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="col-span-full py-16 md:py-24 text-center"
+          >
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-[var(--surface)] border border-[var(--border)] mb-6">
+              <svg className="w-8 h-8 text-[var(--muted)]/40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="11" cy="11" r="8" />
+                <path d="M21 21l-4.35-4.35" />
+              </svg>
+            </div>
+            <h3 className="text-lg font-semibold text-[var(--muted)] mb-2">No results found</h3>
+            <p className="text-sm text-[var(--muted)]/50 max-w-sm mx-auto leading-relaxed">
+              We couldn't find any plants matching "<span className="text-[var(--muted)]/70 font-medium">{searchTerm}</span>". Try a different name or check the spelling.
+            </p>
+          </motion.div>
+        )}
+        {searching && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="col-span-full flex items-center justify-center py-16"
+          >
+            <div className="flex flex-col items-center gap-3">
+              <div className="w-6 h-6 border-2 border-[var(--accent)]/20 border-t-[var(--accent)] rounded-full animate-spin" />
+              <span className="text-xs text-[var(--muted)]/60">Searching plants...</span>
+            </div>
+          </motion.div>
         )}
       </div>
 
       {total > 0 && !searching && (
-        <div className="mt-12 flex items-center justify-center gap-4">
+        <motion.div 
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mt-10 flex items-center justify-center gap-3"
+        >
           <button 
             disabled={currentPage <= 1}
             onClick={() => handleSearch(currentPage - 1)}
-            className="px-6 py-2 rounded-xl border border-[var(--border)] font-semibold hover:bg-[var(--surface)] disabled:opacity-30 transition-all"
+            className="px-4 py-2 rounded-xl border border-[var(--border)] text-xs font-semibold text-[var(--muted)] hover:text-[var(--text)] hover:bg-[var(--border)] disabled:opacity-30 disabled:cursor-not-allowed transition-all flex items-center gap-1.5"
           >
+            <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M15 18l-6-6 6-6"/></svg>
             Previous
           </button>
-          <span className="font-bold">Page {currentPage} / {lastPage}</span>
+          <div className="flex items-center gap-1.5">
+            {Array.from({ length: Math.min(lastPage, 5) }, (_, i) => {
+              const pageNum = currentPage <= 3
+                ? i + 1
+                : currentPage >= lastPage - 2
+                  ? lastPage - 4 + i
+                  : currentPage - 2 + i
+              if (pageNum < 1 || pageNum > lastPage) return null
+              return (
+                <button
+                  key={pageNum}
+                  onClick={() => handleSearch(pageNum)}
+                  className={`w-8 h-8 rounded-lg text-xs font-semibold transition-all ${
+                    pageNum === currentPage
+                      ? "bg-[var(--accent)] text-white shadow-sm"
+                      : "text-[var(--muted)] hover:text-[var(--text)] hover:bg-[var(--border)]"
+                  }`}
+                >
+                  {pageNum}
+                </button>
+              )
+            })}
+          </div>
           <button 
             disabled={currentPage >= lastPage}
             onClick={() => handleSearch(currentPage + 1)}
-            className="px-6 py-2 rounded-xl border border-[var(--border)] font-semibold hover:bg-[var(--surface)] disabled:opacity-30 transition-all"
+            className="px-4 py-2 rounded-xl border border-[var(--border)] text-xs font-semibold text-[var(--muted)] hover:text-[var(--text)] hover:bg-[var(--border)] disabled:opacity-30 disabled:cursor-not-allowed transition-all flex items-center gap-1.5"
           >
             Next
+            <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M9 18l6-6-6-6"/></svg>
           </button>
-        </div>
+        </motion.div>
       )}
 
       <AnimatePresence>

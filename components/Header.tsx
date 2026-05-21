@@ -115,9 +115,18 @@ export default function HeaderDropdown() {
     return () => document.removeEventListener("mousedown", handler)
   }, [])
 
+  const [mobileNavOpen, setMobileNavOpen] = useState(false)
+
+  const navItems = [
+    { label: "Source", href: "/source" },
+    { label: "Docs", href: "/docs" },
+    { label: "Pricing", onClick: () => { setShowPricingPopup(true); setMobileNavOpen(false) } },
+    { label: "Contact", href: "/contact" },
+  ]
+
   return (
     <header
-      className="fixed top-0 left-0 w-full z-50 flex select-none items-center justify-between pl-88 pr-88 h-16"
+      className="fixed top-0 left-0 w-full z-50 flex select-none items-center justify-between px-4 sm:px-8 lg:px-16 xl:px-24 2xl:px-88 h-16"
       style={{
         borderBottom: "1px solid var(--border)",
         background: "var(--bg)",
@@ -127,14 +136,10 @@ export default function HeaderDropdown() {
         Candy Blossom
       </div>
 
-      <nav className="flex items-center gap-6">
+      {/* Desktop nav */}
+      <nav className="hidden md:flex items-center gap-6">
         <div className="flex items-center gap-4">
-          {[
-            { label: "Source", href: "/source", external: false },
-            { label: "Docs", href: "/docs", external: false },
-            { label: "Pricing", onClick: () => setShowPricingPopup(true) },
-            { label: "Contact", href: "/contact", external: false },
-          ].map((item) => (
+          {navItems.map((item) => (
             "onClick" in item ? (
               <button
                 key={item.label}
@@ -146,10 +151,6 @@ export default function HeaderDropdown() {
               >
                 {item.label}
               </button>
-            ) : item.external ? (
-              <ExternalNavItem key={item.label} href={item.href!}>
-                {item.label}
-              </ExternalNavItem>
             ) : (
               <Link
                 key={item.label}
@@ -164,50 +165,6 @@ export default function HeaderDropdown() {
             )
           ))}
 
-          {/* Pricing Popup */}
-          <AnimatePresence>
-            {showPricingPopup && (
-              <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  onClick={() => setShowPricingPopup(false)}
-                  className="absolute inset-0 bg-black/20 backdrop-blur-sm"
-                />
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.95, y: 10 }}
-                  animate={{ opacity: 1, scale: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.95, y: 10 }}
-                  className="relative w-full max-w-sm overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-8"
-                >
-                  <div className="text-center">
-                    <h3 className="mb-6 text-xl font-bold text-[var(--text)]">It's completely free!</h3>
-                    <p className="text-md opacity-60 leading-relaxed">
-                      Candy Blossom's website and application are 100% free to use.
-                      Enjoy taking care of your plants without any cost
-                    </p>
-                    <button
-                      onClick={() => setShowPricingPopup(false)}
-                      className="mt-8 w-full rounded-full px-4 py-2 text-md font-semibold transition-colors cursor-pointer"
-                      style={{
-                        background: dark ? "#fff" : "#F2B5CE",
-                        color: dark ? "#000" : "#fff",
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.background = dark ? "#e4e4e7" : "#e0a1b9"
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.background = dark ? "#fff" : "#F2B5CE"
-                      }}
-                    >
-                      Got it
-                    </button>
-                  </div>
-                </motion.div>
-              </div>
-            )}
-          </AnimatePresence>
           <div className="relative" ref={ref}>
             <button
               onClick={() => setOpen(!open)}
@@ -243,7 +200,6 @@ export default function HeaderDropdown() {
                   }}
                   className="absolute left-1/2 -translate-x-1/2 top-full mt-2 w-[680px] rounded-2xl z-50 overflow-hidden cursor-pointer"
                 >
-
                   <div className="grid grid-cols-3">
                     {products.map((item, i) => (
                       <Link
@@ -273,7 +229,6 @@ export default function HeaderDropdown() {
         </div>
 
         <div className="flex items-center gap-3">
-          {/* Moon / Sun toggle */}
           <motion.button
             onClick={toggle}
             whileTap={{ scale: 0.9 }}
@@ -342,6 +297,173 @@ export default function HeaderDropdown() {
           )}
         </div>
       </nav>
+
+      {/* Mobile controls */}
+      <div className="flex md:hidden items-center gap-2">
+        <motion.button
+          onClick={toggle}
+          whileTap={{ scale: 0.9 }}
+          className="flex items-center justify-center w-8 h-8 rounded-full bg-transparent transition-colors cursor-pointer relative"
+          style={{ color: "var(--muted)" }}
+        >
+          {dark ? <MoonIcon /> : <SunIcon />}
+        </motion.button>
+        <button
+          onClick={() => setMobileNavOpen(!mobileNavOpen)}
+          className="flex items-center justify-center w-8 h-8 rounded-lg transition-colors"
+          style={{ color: "var(--muted)" }}
+          aria-label="Toggle menu"
+        >
+          <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            {mobileNavOpen ? (
+              <><path d="M18 6L6 18M6 6l12 12" /></>
+            ) : (
+              <><line x1="3" y1="6" x2="21" y2="6" /><line x1="3" y1="12" x2="21" y2="12" /><line x1="3" y1="18" x2="21" y2="18" /></>
+            )}
+          </svg>
+        </button>
+      </div>
+
+      {/* Mobile nav overlay */}
+      <AnimatePresence>
+        {mobileNavOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setMobileNavOpen(false)}
+              className="fixed inset-0 top-16 z-40 bg-black/50 backdrop-blur-sm md:hidden"
+            />
+            <motion.div
+              initial={{ x: "100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "100%" }}
+              transition={{ type: "spring", damping: 28, stiffness: 300 }}
+              className="fixed top-16 right-0 bottom-0 z-50 w-72 border-l border-[var(--border)] bg-[var(--surface)] md:hidden overflow-y-auto"
+            >
+              <div className="p-6 flex flex-col gap-6">
+                {navItems.map((item) => (
+                  "onClick" in item ? (
+                    <button
+                      key={item.label}
+                      onClick={item.onClick}
+                      className="text-md text-left py-2 transition-colors"
+                      style={{ color: "var(--muted)" }}
+                    >
+                      {item.label}
+                    </button>
+                  ) : (
+                    <Link
+                      key={item.label}
+                      href={item.href!}
+                      onClick={() => setMobileNavOpen(false)}
+                      className="text-md py-2 transition-colors"
+                      style={{ color: "var(--muted)" }}
+                    >
+                      {item.label}
+                    </Link>
+                  )
+                ))}
+                <div className="h-px" style={{ background: "var(--border)" }} />
+                <Link
+                  href="/docs"
+                  onClick={() => setMobileNavOpen(false)}
+                  className="text-md py-2 transition-colors"
+                  style={{ color: "var(--muted)" }}
+                >
+                  Docs
+                </Link>
+                <div className="h-px" style={{ background: "var(--border)" }} />
+                {isAuthenticated ? (
+                  <button
+                    type="button"
+                    onClick={() => { router.push('/dashboard'); setMobileNavOpen(false) }}
+                    className="text-md font-medium py-2 rounded-full border text-center transition-colors"
+                    style={{
+                      color: dark ? "#000000" : "#FFFFFF",
+                      borderColor: "var(--border)",
+                      background: dark ? "#FFFFFF" : "#F2B5CE",
+                    }}
+                  >
+                    Dashboard
+                  </button>
+                ) : (
+                  !isDashboard && (
+                    <div className="flex flex-col gap-3">
+                      <button
+                        type="button"
+                        onClick={() => { router.push('/auth/login'); setMobileNavOpen(false) }}
+                        className="text-md py-2 text-center transition-colors bg-transparent"
+                        style={{ color: "var(--muted)" }}
+                      >
+                        Log in
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => { router.push('/auth/register'); setMobileNavOpen(false) }}
+                        className="text-md font-medium py-2 rounded-full border text-center transition-colors"
+                        style={{
+                          color: dark ? "#000000" : "#FFFFFF",
+                          borderColor: "var(--border)",
+                          background: dark ? "#FFFFFF" : "#F2B5CE",
+                        }}
+                      >
+                        Sign up
+                      </button>
+                    </div>
+                  )
+                )}
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* Pricing Popup */}
+      <AnimatePresence>
+        {showPricingPopup && (
+          <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowPricingPopup(false)}
+              className="absolute inset-0 bg-black/20 backdrop-blur-sm"
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 10 }}
+              className="relative w-full max-w-sm overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-8"
+            >
+              <div className="text-center">
+                <h3 className="mb-6 text-xl font-bold text-[var(--text)]">It's completely free!</h3>
+                <p className="text-md opacity-60 leading-relaxed">
+                  Candy Blossom's website and application are 100% free to use.
+                  Enjoy taking care of your plants without any cost
+                </p>
+                <button
+                  onClick={() => setShowPricingPopup(false)}
+                  className="mt-8 w-full rounded-full px-4 py-2 text-md font-semibold transition-colors cursor-pointer"
+                  style={{
+                    background: dark ? "#fff" : "#F2B5CE",
+                    color: dark ? "#000" : "#fff",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = dark ? "#e4e4e7" : "#e0a1b9"
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = dark ? "#fff" : "#F2B5CE"
+                  }}
+                >
+                  Got it
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </header>
   )
 }
