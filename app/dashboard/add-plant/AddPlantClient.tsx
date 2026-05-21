@@ -173,7 +173,7 @@ function PlantCard({ plant, onAdd, index }: { plant: Plant, onAdd: (plant: Plant
           <img 
             src="/favicon.ico" 
             alt={plant.common_name} 
-            className="w-full h-full object-contain p-8 opacity-30"
+            className="w-full h-full object-cover opacity-20"
           />
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-[var(--surface)] via-transparent to-transparent opacity-60" />
@@ -202,21 +202,11 @@ function PlantCard({ plant, onAdd, index }: { plant: Plant, onAdd: (plant: Plant
 
         <div className="mt-auto pt-4">
           <button
-            disabled={isMissingInfo}
             onClick={() => onAdd(plant)}
-            className="w-full cursor-pointer py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 flex items-center justify-center gap-2 bg-[var(--accent)]/10 text-[var(--accent)] hover:bg-[var(--accent)] hover:text-white active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-[var(--accent)]/10 disabled:hover:text-[var(--accent)] disabled:active:scale-100"
+            className="w-full cursor-pointer py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 flex items-center justify-center gap-2 bg-[var(--accent)]/10 text-[var(--accent)] hover:bg-[var(--accent)] hover:text-white active:scale-[0.98]"
           >
-            {isMissingInfo ? (
-              <>
-                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                Incomplete Data
-              </>
-            ) : (
-              <>
-                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                Add to Collection
-              </>
-            )}
+            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Add to Collection
           </button>
         </div>
       </div>
