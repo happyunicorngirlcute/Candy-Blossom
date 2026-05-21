@@ -178,12 +178,7 @@ function PlantCard({ plant, onAdd, index }: { plant: Plant, onAdd: (plant: Plant
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-[var(--surface)] via-transparent to-transparent opacity-60" />
         <div className="absolute top-3 right-3 flex gap-2">
-          {isMissingInfo && (
-            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-500/15 backdrop-blur-md text-amber-500 text-[10px] font-semibold uppercase tracking-wider border border-amber-500/20">
-              <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-              Incomplete
-            </span>
-          )}
+  
         </div>
       </div>
 
@@ -275,10 +270,8 @@ export default function AddPlantClient() {
         >
           <h1 className="text-2xl sm:text-3xl md:text-4xl font-semibold tracking-tight text-[var(--text)] leading-[1.15]">
             Search for your plant.
-            <br />
-            <span className="text-[var(--accent)]">I&apos;ll tell you how to take care of it.</span>
-          </h1>
-          <p className="mt-3 text-sm text-[var(--muted)]/70 max-w-md">
+         </h1>
+          <p className="mt-1 text-sm text-[var(--muted)]/70 max-w-md">
             Find any plant species from our database and add it to your collection to start tracking its care.
           </p>
         </motion.div>
@@ -288,9 +281,6 @@ export default function AddPlantClient() {
           transition={{ duration: 0.6, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
           className="w-48 h-48 md:w-56 md:h-56 shrink-0"
         >
-          <Suspense fallback={<div className="w-full h-full" />}>
-            <PlantScene dark={!!dark} />
-          </Suspense>
         </motion.div>
       </div>
 
@@ -300,7 +290,7 @@ export default function AddPlantClient() {
         transition={{ duration: 0.5, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
         className="relative"
       >
-        <div className="bg-[var(--surface)] rounded-2xl border border-[var(--border)] shadow-sm max-w-2xl mx-auto overflow-hidden">
+        <div className="bg-[var(--surface)] rounded-2xl border border-[var(--border)] shadow-sm max-w-2xl overflow-hidden">
           <div className="p-6 sm:p-10">
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
               <div className="relative flex-1">

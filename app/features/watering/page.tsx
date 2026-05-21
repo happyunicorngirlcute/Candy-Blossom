@@ -1,14 +1,8 @@
 "use client"
 
 import { motion } from "framer-motion"
-import { Suspense } from "react"
-import dynamic from "next/dynamic"
-import { useTheme } from "@/components/ThemeProvider"
-
-const WaterScene = dynamic(() => import("@/components/scenes/WaterScene"), { ssr: false })
 
 export default function WateringPage() {
-    const { dark } = useTheme()
     return (
         <div className="min-h-screen pt-24 sm:pt-32 pb-16 sm:pb-20 px-4 sm:px-6">
             <div className="max-w-5xl mx-auto flex flex-col lg:flex-row items-center gap-12">
@@ -30,11 +24,9 @@ export default function WateringPage() {
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ duration: 0.6, delay: 0.15 }}
-                    className="w-56 h-56 shrink-0"
+                    className="w-56 h-56 shrink-0 rounded-2xl bg-gradient-to-br from-blue-500/20 to-transparent border border-blue-500/10 flex items-center justify-center"
                 >
-                    <Suspense fallback={<div className="w-full h-full" />}>
-                        <WaterScene dark={!!dark} />
-                    </Suspense>
+                    <svg className="w-20 h-20 text-blue-500/40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>
                 </motion.div>
             </div>
         </div>

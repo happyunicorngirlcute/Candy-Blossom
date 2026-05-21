@@ -1,14 +1,8 @@
 "use client"
 
 import { motion } from "framer-motion"
-import { Suspense } from "react"
-import dynamic from "next/dynamic"
-import { useTheme } from "@/components/ThemeProvider"
-
-const PlantScene = dynamic(() => import("@/components/scenes/PlantScene"), { ssr: false })
 
 export default function ApplicationPage() {
-    const { dark } = useTheme()
     return (
         <div className="min-h-screen pt-24 sm:pt-32 pb-16 sm:pb-20 px-4 sm:px-6">
             <div className="max-w-5xl mx-auto flex flex-col lg:flex-row items-center gap-12">
@@ -30,11 +24,9 @@ export default function ApplicationPage() {
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ duration: 0.6, delay: 0.15 }}
-                    className="w-56 h-56 shrink-0"
+                    className="w-56 h-56 shrink-0 rounded-2xl bg-gradient-to-br from-purple-500/20 to-transparent border border-purple-500/10 flex items-center justify-center"
                 >
-                    <Suspense fallback={<div className="w-full h-full" />}>
-                        <PlantScene dark={!!dark} />
-                    </Suspense>
+                    <svg className="w-20 h-20 text-purple-500/40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><path d="M12 18h.01"/></svg>
                 </motion.div>
             </div>
         </div>
